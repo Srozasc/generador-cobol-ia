@@ -1,0 +1,1088 @@
+       IDENTIFICATION DIVISION.                                         00000010
+      *************************                                         00000020
+       PROGRAM-ID.    SUPPGNF6.                                         00000030
+       AUTHOR.        JGM.                                              00000040
+       DATE-WRITTEN.  NOV-2014.                                         00000050
+      ***************************************************************** 00000060
+      * SISTEMA   : GENERACION DE INFOME DE PROCESO SEGMENTAC         **00000070
+      * SUBSISTEMA: SUP                                               * 00000080
+      * OBJETIVOS : PROVISIONES                                       * 00000090
+      ***************************************************************** 00000100
+      *                  M A N T E N C I O N E S                      * 00000110
+      * FECHA      RESPONSABLE MOTIVO                                 * 00000120
+      ***************************************************************** 00000100
+       ENVIRONMENT DIVISION.                                            00000130
+       CONFIGURATION SECTION.                                           00000140
+      *=====================                                            00000150
+       SPECIAL-NAMES.                                                   00000160
+           DECIMAL-POINT IS COMMA.                                      00000170
+                                                                        00000180
+       INPUT-OUTPUT SECTION.                                            00000190
+      *                                                                 00000200
+       FILE-CONTROL.                                                    00000210
+      *                                                                 00000300
+           SELECT TABUSR     ASSIGN       TO  TABUSR                      000002
+                             FILE STATUS  IS  WS-STATUS-TABUSR .         0000029
+      *                                                                 00000300
+           SELECT ENTCLI     ASSIGN       TO  ENTCLI                      000002
+                             FILE STATUS  IS  WS-STATUS-ENTCLI .         0000029
+      *                                                                 00000270
+           SELECT SGCDBC     ASSIGN       TO  SGCDBC                      000002
+                             FILE STATUS  IS  WS-STATUS-SGCDBC .         0000029
+      *                                                                 00000270
+           SELECT ENTD0P     ASSIGN       TO  ENTD0P                      000002
+                             FILE STATUS  IS  WS-STATUS-ENTD0P .         0000029
+      *                                                                 00000270
+      *                                                                 00000270
+      * -----------------  S A L I D A -------------------------*       00000300
+      *                                                                 00000300
+           SELECT INFD00     ASSIGN       TO  INFD00                      000002
+                             FILE STATUS  IS  WS-STATUS-INFD00.          0000029
+      *                                                                 00000300
+           SELECT INFCOM     ASSIGN       TO  INFCOM                      000002
+                             FILE STATUS  IS  WS-STATUS-INFCOM.          0000029
+      *                                                                 00000300
+           SELECT INFOPE     ASSIGN       TO  INFOPE                      000002
+                             FILE STATUS  IS  WS-STATUS-INFOPE.          0000029
+      *                                                                 00000300
+      *                                                                 00000300
+           SELECT INFCLI     ASSIGN       TO  INFCLI                      000002
+                             FILE STATUS  IS  WS-STATUS-INFCLI.          0000029
+      *                                                                 00000300
+           SELECT CTRCLI     ASSIGN       TO  CTRCLI                      000002
+                             FILE STATUS  IS  WS-STATUS-CTRCLI.          0000029
+      *                                                                 00000300
+      *                                                                 00000300
+      * ==========================================================*     00000300
+       DATA DIVISION.                                                   00000310
+      **************                                                    00000320
+       FILE SECTION.                                                    00000330
+
+       FD  TABUSR                                                       00001570
+           LABEL RECORD OMITTED.                                        00001580
+       01  REG-STAB.                                                    00001590
+           05 STAB-COD-TTAB  PIC X(03).
+           05 STAB-GLS-FI01  PIC X(01).
+           05 STAB-COD-USER  PIC X(12).
+           05 STAB-GLS-FI02  PIC X(01).
+           05 STAB-IND-VIGE  PIC X(01).
+           05 STAB-GLS-FI03  PIC X(01).
+           05 STAB-FEC-FTRN  PIC X(08).
+           05 STAB-GLS-FI04  PIC X(01).
+           05 STAB-COD-UBIC  PIC X(04).
+           05 STAB-GLS-FI05  PIC X(01).
+           05 STAB-GLS-UBIC  PIC X(34).
+           05 STAB-GLS-FI06  PIC X(01).
+           05 STAB-NUM-IUSR  PIC X(08).
+           05 STAB-GLS-FI07  PIC X(01).
+           05 STAB-VRF-IUSR  PIC X(01).
+           05 STAB-GLS-FI08  PIC X(01).
+           05 STAB-GLS-DESC  PIC X(40).
+           05 STAB-GLS-FI09  PIC X(01).
+           05 STAB-GLS-ABRV  PIC X(05).
+           05 STAB-GLS-FI10  PIC X(01).
+           05 STAB-COD-OFUS  PIC X(03).
+           05 STAB-GLS-FI11  PIC X(01).
+           05 STAB-GLS-OFUS  PIC X(33).
+           05 STAB-GLS-FI12  PIC X(01).
+           05 STAB-COD-AGES  PIC X(03).
+           05 STAB-GLS-FI13  PIC X(01).
+           05 STAB-GLS-AGES  PIC X(28).
+           05 STAB-GLS-FI14  PIC X(01).
+           05 STAB-COD-BNCA  PIC X(03).
+           05 STAB-GLS-FI15  PIC X(01).
+           05 STAB-GLS-BNCA  PIC X(33).
+           05 STAB-GLS-FI16  PIC X(01).
+           05 STAB-COD-REGL  PIC X(03).
+           05 STAB-GLS-FI17  PIC X(01).
+           05 STAB-GLS-REGL  PIC X(28).
+           05 STAB-GLS-FI18  PIC X(01).
+           05 STAB-COD-PLAT  PIC X(01).
+           05 STAB-GLS-FI19  PIC X(01).
+           05 STAB-GLS-PLAT  PIC X(33).
+           05 STAB-GLS-FI20  PIC X(01).
+           05 STAB-COD-CNEG  PIC X(02).
+           05 STAB-GLS-FI21  PIC X(01).
+           05 STAB-GLS-CNEG  PIC X(28).
+           05 STAB-GLS-FI22  PIC X(01).
+           05 STAB-COD-TEJE  PIC X(01).
+           05 STAB-GLS-FI23  PIC X(01).
+           05 STAB-GLS-TEJE  PIC X(10).
+           05 STAB-GLS-FI24  PIC X(01).
+      *                                                                 00000300
+      *                                                                 00000300
+       FD  ENTCLI
+           LABEL RECORD IS OMITTED.                                     00000480
+      *                                                                 00000300
+       01 REG-INF-CLI.                                                   0000050
+          03 SCLI-FEC-FPRO                   PIC X(08).                 0000051
+          03 SCLI-GLS-00                     PIC X(01).                 0051
+          03 SCLI-NUM-RUTD                   PIC X(09).                  0000
+          03 SCLI-GLS-01                     PIC X(01).                  0000
+          03 SCLI-CIC-ICLI                   PIC X(12).                  0000
+          03 SCLI-GLS-02                           PIC X(01).            0000
+          03 SCLI-COD-CALIF                        PIC X(02).            0000
+          03 SCLI-GLS-03                           PIC X(01).            0000
+          03 SCLI-IND-CARDET                       PIC X(01).            0000
+          03 SCLI-GLS-04                           PIC X(01).            0000
+          03 SCLI-COD-TBAN                         PIC X(03).            0000
+          03 SCLI-GLS-05                           PIC X(01).            0000
+          03 SCLI-COD-TBAN-IND                     PIC X(01).            0000
+          03 SCLI-GLS-06                           PIC X(01).            0000
+          03 SCLI-COD-SEGM-OLD                     PIC X(01).
+          03 SCLI-GLS-07                           PIC X(01).            0000
+          03 SCLI-COD-SEGM-NEW                     PIC X(01).
+          03 SCLI-GLS-08                           PIC X(01).            0000
+          03 SCLI-VAL-CMAX                         PIC 9(17).            0000
+          03 SCLI-GLS-09                           PIC X(01).            0000
+          03 SCLI-VAL-TDEU-D00                     PIC 9(17).            0000
+          03 SCLI-GLS-10                           PIC X(01).            0000
+          03 SCLI-VAL-TDEU-FAC                     PIC 9(17).            0000
+          03 SCLI-GLS-11                           PIC X(01).            0000
+          03 SCLI-VAL-TDEU-WOL                     PIC 9(17).            0000
+          03 SCLI-GLS-12                           PIC X(01).            0000
+          03 SCLI-VAL-TDEU-MES                     PIC 9(17).            0000
+          03 SCLI-GLS-10                           PIC X(01).            0000
+          03 SCLI-PRO-DEU-MES6                     PIC 9(17).             000
+          03 SCLI-GLS-11                           PIC X(01).            0000
+          03 SCLI-GLS-SEGMENTA                     PIC X(17).            0000
+          03 SCLI-GLS-12                           PIC X(01).            0000
+          03 SCLI-MESES-PDO                        PIC 9(02).              0000
+          03 SCLI-GLS-13                           PIC X(01).            0000
+      *                                                                 00000040
+      *                                                                 00000300
+       FD  SGCDBC                                                        0000047
+           LABEL RECORD IS OMITTED.                                     00000480
+       01 REG-SSGC.
+          03 SDBC-FEC-FPRO                 PIC X(08).
+          03 SDBC-GLS-01                   PIC X(01).
+          03 SDBC-NUM-RUTD                 PIC X(09).
+          03 SDBC-GLS-02                   PIC X(01).
+          03 SDBC-VRF-RUTD                 PIC X(01).
+          03 SDBC-GLS-03                   PIC X(01).
+          03 SDBC-CIC-ICLI                 PIC X(12).
+          03 SDBC-GLS-04                   PIC X(01).
+          03 SDBC-COD-TBAN                 PIC X(03).
+          03 SDBC-GLS-05                   PIC X(01).
+          03 SDBC-IND-TICL                 PIC X(01).
+          03 SDBC-GLS-06                   PIC X(01).
+          03 SDBC-COD-EJEC                 PIC X(12).
+          03 SDBC-GLS-07                   PIC X(01).
+          03 SDBC-COD-OFIC                 PIC X(03).
+          03 SDBC-GLS-08                   PIC X(01).
+          03 SDBC-COD-SETO                 PIC X(05).
+          03 SDBC-GLS-09                   PIC X(01).
+          03 SDBC-FEC-FINP                 PIC X(08).
+          03 SDBC-GLS-10                   PIC X(01).
+          03 SDBC-FEC-FTRN                 PIC X(08).
+          03 SDBC-GLS-11                   PIC X(01).
+          03 SDBC-COD-OREG                 PIC X(03).
+          03 SDBC-GLS-12                   PIC X(01).
+          03 SDBC-GLS-APAT                 PIC X(25).                   00000510
+          03 SDBC-GLS-AMAT                 PIC X(25).                   00000510
+          03 SDBC-GLS-NOMB                 PIC X(25).                   00000510
+          03 SDBC-GLS-13                   PIC X(01).                   00000510
+          03 REG-CAL-SDBC.
+             05 SDBC-FEC-FCAL              PIC X(08).
+             05 SDBC-GLS-14                PIC X(01).
+             05 SDBC-COD-BANC              PIC X(02).
+             05 SDBC-GLS-15                PIC X(01).
+             05 SDBC-COD-SBIF              PIC X(02).
+             05 SDBC-GLS-16                PIC X(01).
+      *                                                                 00000750
+      *                                                                 00000300
+       FD  ENTD0P                                                        0000047
+           LABEL RECORD IS OMITTED.                                     00000480
+       COPY SUPBRD0G.                                                   00000980
+      *                                                                 00000750
+      *                                                                 00000750
+      *                                                                 00000750
+      * =====================================================*          00000750
+      *      S A  L I D  A                                              00000750
+      * =====================================================*          00000750
+       FD  INFD00                                                        0000047
+           LABEL RECORD IS OMITTED.                                     00000480
+       01  REG-INF-D00.                                                 00000210
+           03 ID00-FEC-FPRO          PIC X(08).                          0000051
+           03 ID00-GLS-001           PIC X(01).                          0000051
+           03 ID00-FEC-FPER          PIC X(06).                          0000051
+           03 ID00-GLS-002           PIC X(01).                          0000051
+           03 ID00-MACRO-SIST        PIC X(04).                          0000025
+           03 ID00-GLS-003           PIC X(01).                          0000029
+           03 ID00-TIP-CART          PIC X(03).                          0000025
+           03 ID00-GLS-004           PIC X(01).                          0000029
+           03 ID00-STP-CART          PIC X(03).                          0000025
+           03 ID00-GLS-005           PIC X(01).                          0000029
+           03 ID00-COD-CLAS          PIC X(01).                          0000025
+           03 ID00-GLS-006           PIC X(01).                          0000029
+           03 ID00-COD-PROCESO       PIC X(06).                          0000025
+           03 ID00-GLS-007           PIC X(01).                          0000029
+           03 ID00-COD-SIST          PIC X(02).                          0000025
+           03 ID00-GLS-008           PIC X(01).                          0000029
+           03 ID00-COD-NIID          PIC X(12).                          0000027
+           03 ID00-GLS-009           PIC X(01).                          0000029
+           03 ID00-COD-TOPE          PIC X(06).                          0000029
+           03 ID00-GLS-010           PIC X(01).                          0000029
+           03 ID00-IND-ESTC          PIC X(01).                          0000037
+           03 ID00-GLS-011           PIC X(01).                          0000029
+           03 ID00-FEC-FOTO          PIC X(08).                          0000041
+           03 ID00-GLS-012           PIC X(01).                          0000029
+           03 ID00-IND-TCRE          PIC X(02).                          0000095
+           03 ID00-GLS-013           PIC X(01).                          0000029
+           03 ID00-COD-CCTB          PIC X(10).                          0000107
+           03 ID00-GLS-014           PIC X(01).                          0000029
+           03 ID00-FEC-FIMO          PIC X(08).                          0000041
+           03 ID00-GLS-015           PIC X(01).                          0000029
+           03 ID00-COD-OREN          PIC X(01).                          0000133
+           03 ID00-GLS-016           PIC X(01).                          0000029
+           03 ID00-VAL-SCON-01       PIC 9(13).                          0000050
+           03 ID00-GLS-017           PIC X(01).                          0000029
+           03 ID00-VAL-SCON-02       PIC 9(13).                          0000050
+           03 ID00-GLS-018           PIC X(01).                          0000029
+           03 ID00-VAL-IPCV          PIC 9(13).                          0000087
+           03 ID00-GLS-019           PIC X(01).                          0000029
+           03 ID00-VAL-RDEV          PIC S9(13) SIGN LEADING SEPARATE.   0000091
+           03 ID00-GLS-020           PIC X(01).                          0000029
+           03 ID00-VAL-MOOP          PIC 9(13).                          0000048
+           03 ID00-GLS-021           PIC X(01).                          0000029
+           03 ID00-OPE-CDET          PIC X(001).
+           03 ID00-GLS-022           PIC X(001).
+           03 ID00-CLI-CDET          PIC X(001).
+           03 ID00-GLS-023           PIC X(001).
+
+      * =====================================================*          00000750
+      *      S A  L I D  A                                              00000750
+      * =====================================================*          00000750
+       FD  INFCOM                                                        0000047
+           LABEL RECORD IS OMITTED.                                     00000480
+       01 REG-INF-COM.
+          03 ICOM-COD-TBAN-EJC             PIC X(03).
+          03 ICOM-GLS-01                   PIC X(01).
+          03 ICOM-COD-OFIC-EJC             PIC X(03).
+          03 ICOM-GLS-02                   PIC X(01).
+          03 ICOM-COD-PLAT-EJC             PIC X(01).
+          03 ICOM-GLS-03                   PIC X(01).
+          03 ICOM-COD-OREG-EJC             PIC X(03).
+          03 ICOM-GLS-04                   PIC X(01).
+          03 ICOM-COD-EJEC                 PIC X(12).
+          03 ICOM-GLS-05                   PIC X(01).
+          03 ICOM-FEC-FPRO                 PIC X(08).
+          03 ICOM-GLS-06                   PIC X(01).
+          03 ICOM-CIC-ICLI                 PIC X(12).
+          03 ICOM-GLS-07                   PIC X(01).
+          03 ICOM-NUM-RUTD                 PIC X(09).
+          03 ICOM-GLS-08                   PIC X(01).
+          03 ICOM-VRF-RUTD                 PIC X(01).
+          03 ICOM-GLS-09                   PIC X(01).
+          03 ICOM-GLS-APAT                 PIC X(25).                   00000510
+          03 ICOM-GLS-AMAT                 PIC X(25).                   00000510
+          03 ICOM-GLS-NOMB                 PIC X(25).                   00000510
+          03 ICOM-GLS-10                   PIC X(01).                   00000510
+          03 ICOM-COD-CALI                 PIC X(02).
+          03 ICOM-GLS-11                   PIC X(01).                   00000510
+          03 ICOM-COD-CLAS                 PIC X(07).
+          03 ICOM-GLS-12                   PIC X(01).                   00000510
+          03 ICOM-TOT-DEU-PROM             PIC 9(16).                   00000510
+          03 ICOM-GLS-13                   PIC X(01).                   00000510
+          03 ICOM-TOT-CLF-PROM             PIC 9(16).                   00000510
+          03 ICOM-GLS-14                   PIC X(01).                   00000510
+          03 ICOM-MES-DEU-PROM             PIC 9(16).                   00000510
+          03 ICOM-GLS-15                   PIC X(01).                   00000510
+          03 ICOM-MES-CLF-PROM             PIC 9(16).                   00000510
+          03 ICOM-GLS-16                   PIC X(01).                   00000510
+          03 ICOM-COD-CARDET               PIC X(01).                   00000510
+          03 ICOM-GLS-17                   PIC X(01).                   00000510
+          03 ICOM-FEC-SEGMENT              PIC X(08).                   00000510
+          03 ICOM-GLS-18                   PIC X(01).                   00000510
+          03 ICOM-IND-ALERTA               PIC X(02).
+          03 ICOM-GLS-19                   PIC X(01).                   00000510
+
+
+       FD  INFOPE                                                        0000047
+           LABEL RECORD IS OMITTED.                                     00000480
+       01 REG-INF-OPE.                                                  0000050
+          03 IOPE-COD-SIST                        PIC X(02).            00000510
+          03 IOPE-CIC-IOPC                        PIC X(21).            00000510
+          03 IOPE-NUM-RUTD                        PIC X(09).            00000510
+          03 IOPE-COD-SEGM                        PIC X(01).            00000510
+
+      *                                                                 00000300
+       FD  INFCLI                                                        0000047
+           LABEL RECORD IS OMITTED.                                     00000480
+       01 REG-SCC.                                                       0000050
+          03 SCC-NUM-RUTD                         PIC X(09).            00000510
+          03 SCC-GLS-01                           PIC X(01).            00000510
+          03 SCC-CIC-ICLI                         PIC X(12).            00000510
+          03 SCC-GLS-02                           PIC X(01).            00000510
+          03 SCC-COD-TBAN                         PIC X(03).            00000510
+          03 SCC-GLS-03                           PIC X(01).            00000510
+          03 SCC-NUM-MESES                        PIC 9(05).            00000510
+          03 SCC-GLS-04                           PIC X(01).            00000510
+          03 SCC-VAL-CMAX                         PIC 9(17).            00000510
+          03 SCC-GLS-05                           PIC X(01).            00000510
+          03 SCC-VAL-TDEU                         PIC 9(17).            00000510
+          03 SCC-GLS-06                           PIC X(01).            00000510
+          03 SCC-COD-SEGM                         PIC X(01).            00000510
+          03 SCC-GLS-07                           PIC X(01).            00000510
+      *                                                                 00000040
+      *                                                                 00000040
+      *                                                                 00000760
+       FD  CTRCLI                                                       00000760
+           LABEL RECORD IS OMITTED.                                     00000760
+       01 REG-CTRC.                                                     00000760
+          03 CTRC-PERIODO                        PIC X(08).             00000760
+          03 CTRC-NUM-REGC                       PIC 9(10).             00000760
+          03 CTRC-TOT-CLI-1                      PIC 9(14)V9(04).       00000760
+          03 CTRC-TOT-CLI-2                      PIC 9(14)V9(04).       00000760
+          03 CTRC-TOT-CLI-3                      PIC 9(14)V9(04).       00000760
+          03 CTRC-TOT-CLI-4                      PIC 9(14)V9(04).       00000760
+          03 CTRC-TOT-CLI-5                      PIC 9(14)V9(04).       00000760
+          03 CTRC-TOT-CLI-6                      PIC 9(14)V9(04).       00000760
+      ************************************************************      00000760
+       WORKING-STORAGE SECTION.                                         00000450
+      ************************************************************      00000780
+      *FIO                                                              00000960
+       COPY GNSWCFIO.                                                   00000970
+       COPY GNSWVFIO.                                                   00000980
+      *FIO                                                              00000990
+      *
+        01  WS-FILE-STATUS.                                             00001020
+            05  WS-STATUS-TABUSR           PIC 9(02).                   00001030
+            05  WS-STATUS-ENTD0P           PIC 9(02).                   00001030
+            05  WS-STATUS-ENTCLI           PIC 9(02).                   00001030
+            05  WS-STATUS-SGCDBC           PIC 9(02).                    0000104
+            05  WS-STATUS-INFD00           PIC 9(02).                    0000104
+            05  WS-STATUS-INFCOM           PIC 9(02).                    0000104
+            05  WS-STATUS-INFOPE           PIC 9(02).                    0000104
+            05  WS-STATUS-INFCLI           PIC 9(02).                    0000104
+            05  WS-STATUS-CTRCLI           PIC 9(02).                    0000104
+      *                                                                 00001060
+      *                                                                 00001060
+       01 WSS-VAR.                                                      00001910
+           03 WR-ENT-ENTD0P         PIC X(01) VALUE  '0'.               00001970
+              88  ENTD0P-FST                VALUE  '1'.                 00001980
+              88  ENTD0P-NXT                VALUE  '2'.                 00001990
+              88  ENTD0P-FIN                VALUE  '3'.                 00002000
+      *                                                                 00002010
+           03 WR-ENT-SGCDBC         PIC X(01) VALUE  '0'.               00001970
+              88  SGCDBC-FST                VALUE  '1'.                 00001980
+              88  SGCDBC-NXT                VALUE  '2'.                 00001990
+              88  SGCDBC-FIN                VALUE  '3'.                 00002000
+      *                                                                 00002010
+           03 WR-ENT-TABUSR         PIC X(01) VALUE  '0'.               00001970
+              88  TABUSR-FST                VALUE  '1'.                 00001980
+              88  TABUSR-NXT                VALUE  '2'.                 00001990
+              88  TABUSR-FIN                VALUE  '3'.                 00002000
+      *                                                                 00002010
+      *                                                                 00002010
+           03 WR-ENT-ENTCLI         PIC X(01) VALUE  '0'.               00001970
+              88  ENTCLI-FST                VALUE  '1'.                 00001980
+              88  ENTCLI-NXT                VALUE  '2'.                 00001990
+              88  ENTCLI-FIN                VALUE  '3'.                 00002000
+      *                                                                 00002010
+      *                                                                 00002010
+      *                                                                 00002010
+      *                                                                 00002010
+       01  TABLA-VAR.                                                   00001170
+           03  WI-TOP              PIC 9(06) VALUE 0.
+           03  WI-USR              PIC 9(06) VALUE 0.
+      *                                                                 00002010
+           03  TABLA-USR.                                               00001180
+               05  TABLA-USR-TAB       OCCURS 30000 TIMES.              00001180
+                   10  TUSR-COD-USER   PIC X(12).                       00001190
+                   10  TUSR-COD-TBAN   PIC X(03).                       00001190
+                   10  TUSR-COD-OFIC   PIC X(03).                       00001190
+                   10  TUSR-COD-PLAT   PIC X(01).                       00001190
+                   10  TUSR-COD-REGL   PIC X(03).                       00001190
+      *                                                                 00002010
+      *                                                                 00000760
+        01 WSS-NUM.                                                     00001070
+           03 WSS-NUM-EDBC                PIC 9(08) VALUE 0.            00001080
+           03 WSS-OPE-COM                 PIC 9(08) VALUE 0.            00001080
+           03 WSS-NUM-LD00                PIC 9(08) VALUE 0.            00001080
+           03 WSS-NUM-LSGC                PIC 9(08) VALUE 0.            00001080
+           03 WSS-NUM-LIND                PIC 9(08) VALUE 0.            00001080
+           03 WSS-NUM-LCDE                PIC 9(08) VALUE 0.            00001080
+           03 WSS-NUM-GSAL                PIC 9(08) VALUE 0.            00001080
+           03 WSS-NUM-LSGM                PIC 9(08) VALUE 0.            00001080
+           03 WSS-NUM-LUSR                PIC 9(08) VALUE 0.            00001080
+
+           03 WSS-GRB-ICOM                PIC 9(08) VALUE 0.            00001080
+           03 WSS-GRB-ID00                PIC 9(08) VALUE 0.            00001080
+           03 WSS-GRB-IOPE                PIC 9(08) VALUE 0.            00001080
+           03 WSS-INF-GCLI                PIC 9(08) VALUE 0.            00001080
+      *                                                                 00001160
+           03 WSS-VAL-MNAC    VALUE ZEROES     PIC S9(11)V9(04).
+           03 WSS-VAL-MONE    VALUE ZEROES     PIC S9(11)V9(04).
+           03 WSS-VCAM                         PIC X(06).
+      *                                                                 00001160
+       01 REG-XDBC.
+          03 XDBC-IND-TICL                 PIC X(01).
+          03 XDBC-COD-EJEC                 PIC X(12).
+          03 XDBC-COD-OFIC                 PIC X(03).
+          03 XDBC-COD-OREG                 PIC X(03).
+          03 XDBC-GLS-APAT                 PIC X(25).                   00000510
+          03 XDBC-GLS-AMAT                 PIC X(25).                   00000510
+          03 XDBC-GLS-NOMB                 PIC X(25).                   00000510
+      *                                                                 00001900
+      *
+       01 REG-XDBC.
+          03  XSGM-IND-CDET                PIC X(01).                    0000183
+          03  XSGM-IND-SGM                 PIC X(01).                    0000183
+          03  XSGM-IND-ALERTA              PIC X(01).                    0000051
+          03  XSGM-TOT-DEU-MES             PIC 9(16).                    0000051
+          03  XSGM-TOT-CLF-MES             PIC 9(16).                    0000051
+          03  XSGM-DEU-PROMEDIO            PIC 9(16).                     000005
+          03  XSGM-CLF-PROMEDIO            PIC 9(16).                     000005
+          03  XSGM-FEC-FSGM                PIC X(08).                    0000051
+      *
+      *                                                                 00001160
+       01  PXX-VAR.                                                     00001730
+           03 PXX-VRF-RUTD                     PIC X(01).               00001790
+           03 PXX-NUM-RUTD                     PIC X(09).               00001790
+           03 PNN-NUM-RUTD   REDEFINES PXX-NUM-RUTD PIC 9(09).
+           03 PXX-IND-CDE                      PIC X(01).               00001830
+           03 PXX-IND-CDET                     PIC X(01).               00001830
+           03 PXX-COD-TBAN                     PIC X(03).               00001830
+      *                                                                 00001160
+      *
+       01  COB-VAR.                                                     00001730
+           03 COB-VRF-ICLI                     PIC X(01).               00001790
+           03 COB-NUM-RUTD                     PIC X(09).               00001830
+           03 COB-VRF-RUTD                     PIC X(01).               00001830
+           03 COB-IND-TBAN                     PIC X(01).               00001830
+           03 COB-IND-SGC                      PIC X(01).               00001830
+           03 COB-IND-SCLI                     PIC X(01).               00001830
+
+      *                                                                 00001860
+      *                                                                 00001900
+       01  WSS-DIS.                                                     00001870
+           03 DIS-VAL-TOPE-01 VALUE ZEROES PIC  ZZZZZ.ZZZ.ZZZ.ZZ9.
+           03 DIS-VAL-TOPE-02 VALUE ZEROES PIC  ZZZZZ.ZZZ.ZZZ.ZZ9.
+           03 DIS-VAL-TOPE-03 VALUE ZEROES PIC  ZZZZZ.ZZZ.ZZZ.ZZ9.
+           03 DIS-VAL-TOPE-04 VALUE ZEROES PIC  ZZZZZ.ZZZ.ZZZ.ZZ9.
+      *
+        01  WCC-VAR.                                                    00002030
+            03 CC-50MIL        VALUE 50000000   PIC 9(08).
+            03 CC-PLC300       VALUE 'PLC300'   PIC X(06).
+            03 CC-HIP          VALUE 'HIP'      PIC X(03).
+            03 CC-GR           VALUE 'GR'       PIC X(02).
+            03 CC-GR-HIP       VALUE 'GR_HIP'   PIC X(06).
+            03 CC-COM          VALUE 'COM'      PIC X(03).
+            03 CC-BCI          VALUE 'BCI '     PIC X(04).
+            03 CC-LEA          VALUE 'LEA '     PIC X(04).
+            03 CC-ID-COM       VALUE 'ID_COM'   PIC X(06).
+            03 CC-I            VALUE 'I'        PIC X(01).
+            03 CC-999          VALUE 999        PIC 9(03).              00002070
+            03 CC-01           VALUE '01'       PIC X(02).              00002040
+            03 CC-VCAM-UF      VALUE '0998  '   PIC X(06).
+            03 CC-VCAM-PESO    VALUE '0999  '   PIC X(06).
+            03 CC-02           VALUE '02'       PIC X(02).              00002040
+            03 CC-03           VALUE '03'       PIC X(02).              00002050
+            03 CC-04           VALUE '04'       PIC X(02).              00002050
+            03 CC-05           VALUE '05'       PIC X(02).              00002060
+            03 CC-007          VALUE '007'      PIC X(03).              00002050
+            03 CC-P            VALUE 'P'        PIC X(01).              00002070
+            03 CC-N            VALUE 'N'        PIC X(01).              00002080
+            03 CC-S            VALUE 'S'        PIC X(01).              00002090
+            03 CC-E            VALUE 'E'        PIC X(01).              00002100
+            03 CC-G            VALUE 'G'        PIC X(01).              00002100
+            03 CC-B            VALUE 'B'        PIC X(01).              00002100
+            03 CC-D            VALUE 'D'        PIC X(01).              00002100
+      *                                                                 00002110
+      *                                                                 00001900
+        01  VAR-PARAME.                                                 00002030
+           03 PAR-FEC-FPER.                                             00002090
+              05 PAR-NUM-SPER              PIC 9(02).                   00002100
+              05 PAR-NUM-APER              PIC 9(02).                   00002140
+              05 PAR-NUM-MPER              PIC 9(02).                   00002150
+           03 PAR-FEC-FPRO.                                             00002090
+              05 PAR-NUM-SPRO              PIC 9(02).                   00002100
+              05 PAR-NUM-APRO              PIC 9(02).                   00002140
+              05 PAR-NUM-MPRO              PIC 9(02).                   00002150
+              05 PAR-NUM-DPRO              PIC 9(02).                   00002150
+      **************************************************************    00002130
+      *                   USER INFORMATION BLOCK                   *    00002140
+      **************************************************************    00002150
+      *                                                                 00002160
+       01  WB-UIB.                                                      00002170
+           05  FILLER                       PIC X(32) VALUE 'SUPPGNF6'. 00002180
+      ************************************************************      00002200
+      *                                                                 00002210
+      ************************************************************      00002220
+       PROCEDURE DIVISION.                                              00002230
+      *------------------                                               00002240
+       INI-MAIN.                                                        00002250
+           PERFORM OPEN-FILES-INP.                                          0000
+           PERFORM OPEN-FILES-OUT.                                          0000
+           PERFORM LEE-TAB-USR.                                             0000
+           PERFORM PROC-REG-ENT.                                        00002320
+           PERFORM PUT-REG-CTR.
+       NXT-MAIN.                                                        00002330
+           PERFORM ESTADISTICA.                                         00002340
+           PERFORM CLOSE-FILES.                                         00002350
+       FIN-MAIN.                                                        00002370
+           GOBACK.                                                      00002380
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       OPEN-FILES-INP SECTION.                                              0000
+       INI-OPEN-FILES-INP.                                                  0000
+           MOVE '1'   TO WR-ENT-SGCDBC.
+           MOVE '1'   TO WR-ENT-ENTD0P.
+           MOVE '1'   TO WR-ENT-ENTCLI.
+           MOVE '1'   TO WR-ENT-TABUSR.
+
+           OPEN  INPUT  SGCDBC                                          00002450
+           OPEN  INPUT  ENTD0P                                          00002450
+           OPEN  INPUT  ENTCLI                                          00002450
+           OPEN  INPUT  TABUSR                                          00002450
+           IF  WS-STATUS-SGCDBC    > 0  OR                              00002460
+               WS-STATUS-ENTD0P    > 0  OR                              00002460
+               WS-STATUS-ENTCLI    > 0  OR                              00002460
+               WS-STATUS-TABUSR    > 0                                  00002460
+               DISPLAY ' ERROR SGCDBC:' WS-STATUS-SGCDBC                00002470
+               DISPLAY ' ERROR ENTD0P:' WS-STATUS-ENTD0P                00002470
+               DISPLAY ' ERROR ENTCLI:' WS-STATUS-ENTCLI                00002470
+               DISPLAY ' ERROR TABUSR:' WS-STATUS-TABUSR                00002470
+                PERFORM GNS-PRO-ABT                                     00002480
+           END-IF.                                                      00002490
+       FIN-OPEN-FILES-INP.                                                  0000
+           EXIT.                                                        00002630
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       OPEN-FILES-OUT SECTION.                                              0000
+       INI-OPEN-FILES-OUT.                                                  0000
+           OPEN  OUTPUT INFD00 .                                         0000257
+           IF  WS-STATUS-INFD00     > 0                                  0000258
+               DISPLAY ' ERROR INFD00 : ' WS-STATUS-INFD00                000025
+                PERFORM GNS-PRO-ABT                                     00002600
+           END-IF.                                                      00002610
+
+           OPEN  OUTPUT INFCOM .                                         0000257
+           IF  WS-STATUS-INFCOM     > 0                                  0000258
+               DISPLAY ' ERROR INFCOM : ' WS-STATUS-INFCOM                000025
+                PERFORM GNS-PRO-ABT                                     00002600
+           END-IF.                                                      00002610
+
+           OPEN  OUTPUT INFOPE .                                         0000257
+           IF  WS-STATUS-INFOPE     > 0                                  0000258
+               DISPLAY ' ERROR INFOPE : ' WS-STATUS-INFOPE                000025
+                PERFORM GNS-PRO-ABT                                     00002600
+           END-IF.                                                      00002610
+
+           OPEN  OUTPUT INFCLI .                                         0000257
+           IF  WS-STATUS-INFCLI     > 0                                  0000258
+               DISPLAY ' ERROR INFCLI : ' WS-STATUS-INFCLI                000025
+                PERFORM GNS-PRO-ABT                                     00002600
+           END-IF.                                                      00002610
+
+           OPEN  OUTPUT CTRCLI .                                         0000257
+           IF  WS-STATUS-CTRCLI     > 0                                  0000258
+               DISPLAY ' ERROR CTRCLI : ' WS-STATUS-CTRCLI                000025
+                PERFORM GNS-PRO-ABT                                     00002600
+           END-IF.                                                      00002610
+
+       FIN-OPEN-FILES-OUT.                                                  0000
+           EXIT.                                                        00002630
+      *                                                                 00002440
+      *                                                                 00002440
+       MOV-DAT-COB  SECTION.                                            00003590
+       INI-MOV-DAT-COB.                                                 00003600
+           MOVE D0P-COD-RUTD(1)  TO COB-NUM-RUTD
+           MOVE D0P-VRF-RUTD(1)  TO COB-VRF-RUTD.
+           MOVE 0                TO WSS-OPE-COM.
+           MOVE D0P-FEC-FPRO     TO PAR-FEC-FPRO.                        0000051
+           MOVE D0P-FEC-FPER     TO PAR-FEC-FPER.                        0000051
+       FIN-MOV-DAT-COB.                                                 00003600
+           EXIT.
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       PROC-REG-ENT SECTION.                                            00003590
+       INI-PROC-REG-ENT.                                                00003600
+           DISPLAY ' LEER-ENTD0P          '
+           PERFORM LEER-ENTD0P .                                        00003610
+           IF ENTD0P-FIN                                                00003620
+               DISPLAY 'ARCHIVO VACIO CLIENTES'                         00003630
+               GO TO FIN-PROC-REG-ENT                                   00003640
+            END-IF.                                                     00003650
+           PERFORM LEER-SGCDBC.                                         00003050
+           PERFORM MOV-DAT-COB.
+       LUP-PROC-REG-ENT.                                                00003680
+           IF  PXX-NUM-RUTD NOT = COB-NUM-RUTD
+               PERFORM PUT-INF-X-CLI
+               PERFORM MOV-DAT-COB
+           END-IF.
+
+           IF   D0P-TIP-CART  = CC-COM
+                ADD  1    TO WSS-OPE-COM
+                PERFORM PUT-SEGMEN-OPE
+           END-IF.
+           PERFORM PUT-INF-X-OPE.
+       NXT-PROC-REG-ENT.                                                00004290
+           PERFORM LEER-ENTD0P.                                         00004300
+           IF NOT ENTD0P-FIN                                            00004310
+              GO TO LUP-PROC-REG-ENT                                    00004320
+           END-IF.                                                      00004330
+           PERFORM PUT-INF-X-CLI.
+       FIN-PROC-REG-ENT.                                                00004340
+           EXIT.                                                        00004350
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       PUT-INF-X-OPE SECTION.                                             000057
+       INI-PUT-INF-X-OPE.                                                 000057
+           PERFORM MOV-FIL-INFD00.
+       NXT-PUT-INF-X-OPE.                                                 000057
+           MOVE D0P-FEC-FPRO    TO  ID00-FEC-FPRO                        0000051
+           MOVE D0P-FEC-FPER    TO  ID00-FEC-FPER                        0000051
+           MOVE D0P-MACRO-SIST  TO  ID00-MACRO-SIST                      0000025
+           MOVE D0P-TIP-CART    TO  ID00-TIP-CART                        0000025
+           MOVE D0P-STP-CART    TO  ID00-STP-CART                        0000025
+           MOVE D0P-COD-CLAS    TO  ID00-COD-CLAS                        0000025
+           MOVE D0P-COD-PROCESO TO  ID00-COD-PROCESO                     0000025
+           MOVE D0P-COD-SIST    TO  ID00-COD-SIST                        0000025
+           MOVE D0P-COD-NIID    TO  ID00-COD-NIID                        0000027
+           MOVE D0P-COD-TOPE    TO  ID00-COD-TOPE                        0000029
+           MOVE D0P-IND-ESTC    TO  ID00-IND-ESTC                        0000037
+           MOVE D0P-FEC-FOTO    TO  ID00-FEC-FOTO.                       0000041
+           MOVE D0P-IND-TCRE    TO  ID00-IND-TCRE                        0000095
+           MOVE D0P-COD-CCTB    TO  ID00-COD-CCTB                        0000107
+           MOVE D0P-FEC-FIMO    TO  ID00-FEC-FIMO.                       0000041
+           MOVE D0P-COD-OREN    TO  ID00-COD-OREN                        0000133
+           MOVE D0P-VAL-IPCV    TO  ID00-VAL-IPCV                        0000087
+           MOVE D0P-VAL-RDEV    TO  ID00-VAL-RDEV                        0000091
+           MOVE D0P-VAL-MOOP    TO  ID00-VAL-MOOP                        0000048
+           MOVE D0P-IND-CDET    TO  ID00-OPE-CDET
+           MOVE XSGM-IND-CDET   TO  ID00-CLI-CDET
+
+           COMPUTE ID00-VAL-SCON-01 = D0P-VAL-SCON                       0000050
+           COMPUTE ID00-VAL-SCON-02 = D0P-VAL-SCON + D0P-VAL-SREP.       0000050
+
+           WRITE REG-INF-D00.                                            0000421
+           IF   WS-STATUS-INFD00  > 0                                    0000422
+                DISPLAY 'ERROR : GRABAR INFD00:  '  WS-STATUS-INFD00    00004230
+                PERFORM GNS-PRO-ABT                                     00004250
+           ELSE                                                         00004260
+               ADD  1   TO WSS-GRB-ID00                                 00004270
+           END-IF.                                                      00004280
+       FIN-PUT-INF-X-OPE.                                                 000059
+           EXIT.                                                        00005970
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       PUT-INF-X-CLI SECTION.                                             000057
+       INI-PUT-INF-X-CLI.                                                 000057
+           PERFORM BUS-REG-SGCDBC
+           IF COB-IND-SGC = CC-N
+              ADD  1   TO WSS-NUM-EDBC
+           END-IF
+           PERFORM BUS-REG-ENTCLI.
+           PERFORM MOV-FIL-INFCOM.
+           PERFORM BUS-COD-EJC.
+       NXT-PUT-INF-X-CLI.                                                 000057
+           MOVE XDBC-COD-EJEC     TO     ICOM-COD-EJEC
+           MOVE D0P-CIC-ICLI      TO     ICOM-CIC-ICLI
+           MOVE XDBC-GLS-APAT     TO     ICOM-GLS-APAT                  00000510
+           MOVE XDBC-GLS-AMAT     TO     ICOM-GLS-AMAT                  00000510
+           MOVE XDBC-GLS-NOMB     TO     ICOM-GLS-NOMB                  00000510
+           MOVE D0P-FEC-FPRO      TO     ICOM-FEC-FPRO
+           MOVE COB-NUM-RUTD      TO     ICOM-NUM-RUTD
+           MOVE COB-VRF-RUTD      TO     ICOM-VRF-RUTD
+           MOVE D0P-COD-CALI      TO     ICOM-COD-CALI                  0000510
+           MOVE D0P-COD-PROCESO   TO     ICOM-COD-CLAS                  0000510
+
+           MOVE XSGM-TOT-DEU-MES  TO     ICOM-MES-DEU-PROM               0000051
+           MOVE XSGM-TOT-CLF-MES  TO     ICOM-MES-CLF-PROM               0000051
+
+           MOVE XSGM-DEU-PROMEDIO TO    ICOM-TOT-DEU-PROM                 000005
+           MOVE XSGM-CLF-PROMEDIO TO    ICOM-TOT-CLF-PROM                 000005
+
+           MOVE XSGM-IND-CDET     TO     ICOM-COD-CARDET                 0000051
+           MOVE XSGM-FEC-FSGM     TO     ICOM-FEC-SEGMENT                0000051
+           MOVE XSGM-IND-ALERTA   TO     ICOM-IND-ALERTA                 0000051
+
+           WRITE REG-INF-COM.                                            0000421
+           IF   WS-STATUS-INFCOM  > 0                                    0000422
+                DISPLAY 'ERROR : GRABAR INFCOM:  '  WS-STATUS-INFCOM    00004230
+                PERFORM GNS-PRO-ABT                                     00002600
+           ELSE
+               ADD  1   TO WSS-GRB-ICOM                                 00004270
+           END-IF.                                                      00005520
+       FIN-PUT-INF-X-CLI.                                                 000059
+           EXIT.                                                        00005550
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       PUT-SEGMEN-OPE SECTION.                                             00005
+       INI-PUT-SEGMEN-OPE.                                                 00005
+           MOVE D0P-COD-RUTD(1) TO  IOPE-NUM-RUTD
+           MOVE D0P-COD-CLAS    TO  IOPE-COD-SEGM                       0000510
+           MOVE D0P-COD-SIST    TO  IOPE-COD-SIST                        0000025
+           MOVE D0P-COD-NIID    TO  IOPE-CIC-IOPC                       00000510
+
+           WRITE REG-INF-OPE.                                            0000421
+           IF   WS-STATUS-INFOPE  > 0                                    0000422
+                DISPLAY 'ERROR : GRABAR INFOPE:  '  WS-STATUS-INFOPE    00004230
+                PERFORM GNS-PRO-ABT                                     00004250
+           ELSE
+               ADD  1   TO WSS-GRB-IOPE                                 00004270
+           END-IF.                                                      00005520
+       FIN-PUT-SEGMEN-OPE.                                                 00005
+           EXIT.                                                        00005550
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       BUS-REG-SGCDBC  SECTION.                                            00002
+       INI-BUS-REG-SGCDBC.                                                 00002
+           MOVE SPACES         TO XDBC-IND-TICL
+           MOVE SPACES         TO XDBC-COD-EJEC
+           MOVE SPACES         TO XDBC-COD-OFIC
+           MOVE SPACES         TO XDBC-COD-OREG
+           MOVE SPACES         TO XDBC-GLS-APAT                         00000510
+           MOVE SPACES         TO XDBC-GLS-AMAT                         00000510
+           MOVE SPACES         TO XDBC-GLS-NOMB                         00000510
+           MOVE CC-N       TO COB-IND-SGC.
+           MOVE CC-N       TO COB-IND-TBAN.                                 0000
+           IF SGCDBC-FIN                                                00002790
+              GO TO FIN-BUS-REG-SGCDBC                                     00002
+           END-IF.                                                      00005480
+       LUP-BUS-REG-SGCDBC.                                                 00002
+           IF  SDBC-NUM-RUTD   = COB-NUM-RUTD                           00002900
+               MOVE CC-S           TO COB-IND-SGC
+               MOVE SDBC-IND-TICL  TO XDBC-IND-TICL
+               MOVE SDBC-COD-EJEC  TO XDBC-COD-EJEC
+               MOVE SDBC-COD-OFIC  TO XDBC-COD-OFIC
+               MOVE SDBC-COD-OREG  TO XDBC-COD-OREG
+               MOVE SDBC-GLS-APAT  TO XDBC-GLS-APAT                     00000510
+               MOVE SDBC-GLS-AMAT  TO XDBC-GLS-AMAT                     00000510
+               MOVE SDBC-GLS-NOMB  TO XDBC-GLS-NOMB                     00000510
+               GO TO FIN-BUS-REG-SGCDBC                                    00002
+           END-IF.                                                      00005520
+      *                                                                 00002440
+           IF  SDBC-NUM-RUTD  >  COB-NUM-RUTD                           00002960
+               GO TO FIN-BUS-REG-SGCDBC                                    00003
+           END-IF.                                                      00005480
+       NXT-BUS-REG-SGCDBC.                                                 00003
+           PERFORM LEER-SGCDBC                                          00003050
+           IF NOT SGCDBC-FIN                                            00003060
+              GO TO LUP-BUS-REG-SGCDBC                                     00003
+           END-IF.                                                      00005520
+       FIN-BUS-REG-SGCDBC.                                                 00003
+           EXIT.                                                        00005550
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       BUS-REG-ENTCLI  SECTION.                                            00002
+       INI-BUS-REG-ENTCLI.                                                 00002
+           MOVE SPACES TO   XSGM-IND-CDET                                0000183
+           MOVE ZEROES TO   XSGM-TOT-DEU-MES                             0000051
+           MOVE ZEROES TO   XSGM-TOT-CLF-MES                             0000051
+      *                                                                 00002440
+           MOVE ZEROES TO   XSGM-DEU-PROMEDIO                             000005
+           MOVE ZEROES TO   XSGM-CLF-PROMEDIO                             000005
+      *                                                                 00002440
+           MOVE ZEROES TO   XSGM-FEC-FSGM                                0000051
+           MOVE CC-N   TO   XSGM-IND-ALERTA                              0000051
+           MOVE CC-N   TO   XSGM-IND-SGM                                 0000051
+           IF ENTCLI-FIN                                                00002790
+              GO TO FIN-BUS-REG-ENTCLI                                     00002
+           END-IF.                                                      00005480
+       LUP-BUS-REG-ENTCLI.                                                 00002
+           IF  SCLI-NUM-RUTD    = COB-NUM-RUTD                          00002900
+               IF WSS-OPE-COM > 0
+                   PERFORM PUT-SEGMEN-CLI
+               END-IF
+               MOVE CC-S                TO XSGM-IND-SGM
+               MOVE ZEROES              TO XSGM-CLF-PROMEDIO              000005
+               MOVE ZEROES              TO XSGM-TOT-CLF-MES                  000
+               MOVE SCLI-IND-CARDET     TO XSGM-IND-CDET                     000
+               MOVE SCLI-PRO-DEU-MES6   TO XSGM-DEU-PROMEDIO              000005
+               MOVE SCLI-VAL-TDEU-MES   TO XSGM-TOT-DEU-MES               000005
+               GO TO FIN-BUS-REG-ENTCLI                                    00002
+           END-IF.                                                      00005520
+      *                                                                 00002950
+           IF  SCLI-NUM-RUTD    >  COB-NUM-RUTD                         00002960
+               GO TO FIN-BUS-REG-ENTCLI                                    00003
+           END-IF.                                                      00003020
+       NXT-BUS-REG-ENTCLI.                                                 00003
+           PERFORM LEER-ENTCLI                                          00003050
+           IF NOT ENTCLI-FIN                                            00003060
+              GO TO LUP-BUS-REG-ENTCLI                                     00003
+           END-IF.                                                      00003100
+       FIN-BUS-REG-ENTCLI.                                                 00003
+           EXIT.                                                        00005550
+      *
+      *                                                                 00002440
+      *                                                                 00002440
+       PUT-SEGMEN-CLI SECTION.                                             00005
+       INI-PUT-SEGMEN-CLI.                                                 00005
+           MOVE '|'                   TO SCC-GLS-01.
+           MOVE '|'                   TO SCC-GLS-02.
+           MOVE '|'                   TO SCC-GLS-03.
+           MOVE '|'                   TO SCC-GLS-04.
+           MOVE '|'                   TO SCC-GLS-05.
+           MOVE '|'                   TO SCC-GLS-06.
+           MOVE '|'                   TO SCC-GLS-07.
+
+           MOVE SCLI-CIC-ICLI         TO SCC-CIC-ICLI                   00004120
+           MOVE SCLI-NUM-RUTD         TO SCC-NUM-RUTD                   00004080
+           MOVE SCLI-COD-TBAN         TO SCC-COD-TBAN                   00004130
+           MOVE ZEROES                TO SCC-NUM-MESES
+           MOVE ZEROES                TO SCC-VAL-CMAX
+           MOVE SCLI-VAL-TDEU-MES     TO SCC-VAL-TDEU
+           MOVE SCLI-COD-SEGM-NEW     TO SCC-COD-SEGM                   00004130
+
+           WRITE REG-SCC.                                                0000421
+           IF   WS-STATUS-INFCLI  NOT = 00                               0000422
+                DISPLAY 'ERROR : GRABAR INFCLI   :  '                   00004230
+                WS-STATUS-INFCLI                                         0000424
+                PERFORM GNS-PRO-ABT                                     00004250
+           ELSE
+               ADD  1   TO WSS-INF-GCLI                                 00004270
+           END-IF.
+       FIN-PUT-SEGMEN-CLI.                                                 00005
+           EXIT.
+      *                                                                 00002440
+      *                                                                 00002440
+       ESTADISTICA SECTION.                                             00005110
+       INI-ESTADISTICA.                                                 00005120
+           DISPLAY '============================'                       00005130
+           DISPLAY '*  PROGRAMA :  SUPPGNF6 '.                          00005140
+           DISPLAY '*  VERSION..:  V03 (ENE-2017  )'                    00005150
+           DISPLAY '*  SISTEMA..:  SEGMENTACION D00           '         00005160
+           DISPLAY '*  OBJETIVO.:  GENERA INFORME             '         00005170
+           DISPLAY '================================================'   00005180
+           DISPLAY ' FECHA PERIODO ..............: '  PAR-FEC-FPER.     0005190
+           DISPLAY ' FECHA PROCESO ..............: '  PAR-FEC-FPRO.     0005190
+           DISPLAY '================================================'.  00005180
+           DISPLAY ' ENTRADA D00 SEGMENTADO......: '  WSS-NUM-LD00.     0005190
+           DISPLAY ' ENTRADA EXTSGC..............: '  WSS-NUM-LSGC.     0005190
+           DISPLAY '================================================'.  00005180
+           DISPLAY ' SALIDA  INFORME D00.........: '  WSS-GRB-ID00.     0005190
+           DISPLAY ' SALIDA  INFORME COM.........: '  WSS-GRB-ICOM.     0005190
+           DISPLAY ' SALIDA  INFORME SEGMENOPE...: '  WSS-GRB-IOPE.     0005190
+           DISPLAY ' SALIDA  INFORME SEGMEN CLI..: '  WSS-INF-GCLI.     0005190
+           DISPLAY '================================================'.  00005180
+           DISPLAY ' CLIENTE NO EXISTE EXTSGC....: '  WSS-NUM-EDBC.     0005190
+           DISPLAY '================================================'.  00005180
+       FIN-ESTADISTICA.                                                 00005250
+           EXIT.                                                        00005260
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       CLOSE-FILES SECTION.                                             00005300
+       INI-CLOSE-FILES.                                                 00005310
+           CLOSE  ENTD0P                                                00005320
+           CLOSE  ENTCLI                                                00005320
+           CLOSE  SGCDBC                                                00005320
+           CLOSE  INFD00.                                                0000533
+           CLOSE  INFCOM.                                                0000533
+           CLOSE  INFOPE.                                                0000533
+           CLOSE  INFCLI.                                                0000533
+           CLOSE  CTRCLI.                                                0000533
+       FIN-CLOSE-FILES.                                                 00005340
+           EXIT.                                                        00005350
+      *                                                                 00002440
+      *                                                                 00002440
+      *
+      *
+      *
+      *
+       COPY GNSBTABT.                                                   00004910
+       COPY GNSBGABT.                                                   00004920
+       COPY GNSBGEND.                                                   00004930
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       LEER-ENTD0P  SECTION.                                            00004870
+       INI-LEER-ENTD0P .                                                00004880
+           READ ENTD0P     AT END                                       00004890
+                MOVE '3' TO WR-ENT-ENTD0P                               00004900
+                GO TO FIN-LEER-ENTD0P                                   00004910
+           END-READ.                                                    00004920
+           ADD  1  TO WSS-NUM-LD00.                                     00004930
+           MOVE D0P-COD-RUTD(1)  TO PXX-NUM-RUTD
+           MOVE D0P-VRF-RUTD(1)  TO PXX-VRF-RUTD.
+       FIN-LEER-ENTD0P .                                                00004940
+           EXIT.                                                        00004950
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       LEER-ENTCLI  SECTION.                                            00004870
+       INI-LEER-ENTCLI .                                                00004880
+           READ ENTCLI     AT END                                       00004890
+                MOVE '3' TO WR-ENT-ENTCLI                               00004900
+                GO TO FIN-LEER-ENTCLI                                   00004910
+           END-READ.                                                    00004920
+           ADD  1  TO WSS-NUM-LSGM.                                     00004930
+       FIN-LEER-ENTCLI.                                                 00004940
+           EXIT.                                                        00004950
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       LEER-SGCDBC  SECTION.                                            00004870
+       INI-LEER-SGCDBC.                                                 00004880
+           READ SGCDBC     AT END                                       00004890
+                MOVE '3' TO WR-ENT-SGCDBC                               00004900
+                GO TO FIN-LEER-SGCDBC                                   00004910
+           END-READ.                                                    00004920
+           ADD  1  TO WSS-NUM-LSGC.                                     00004930
+       FIN-LEER-SGCDBC.                                                 00004940
+           EXIT.                                                        00004950
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       MOV-FIL-INFD00 SECTION.                                          0000578
+       INI-MOV-FIL-INFD00.                                              0000579
+           MOVE '|'    TO ID00-GLS-001.
+           MOVE '|'    TO ID00-GLS-002.
+           MOVE '|'    TO ID00-GLS-003.
+           MOVE '|'    TO ID00-GLS-004.
+           MOVE '|'    TO ID00-GLS-005.
+           MOVE '|'    TO ID00-GLS-006.
+           MOVE '|'    TO ID00-GLS-007.
+           MOVE '|'    TO ID00-GLS-008.
+           MOVE '|'    TO ID00-GLS-009.
+           MOVE '|'    TO ID00-GLS-010.
+           MOVE '|'    TO ID00-GLS-011.
+           MOVE '|'    TO ID00-GLS-012.
+           MOVE '|'    TO ID00-GLS-013.
+           MOVE '|'    TO ID00-GLS-014.
+           MOVE '|'    TO ID00-GLS-015.
+           MOVE '|'    TO ID00-GLS-016.
+           MOVE '|'    TO ID00-GLS-017.
+           MOVE '|'    TO ID00-GLS-018.
+           MOVE '|'    TO ID00-GLS-019.
+           MOVE '|'    TO ID00-GLS-020.
+           MOVE '|'    TO ID00-GLS-021.
+           MOVE '|'    TO ID00-GLS-022.
+           MOVE '|'    TO ID00-GLS-023.
+       FIN-MOV-FIL-INFD00.                                              0000579
+           EXIT.                                                        00004950
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       MOV-FIL-INFCOM SECTION.                                          0000578
+       INI-MOV-FIL-INFCOM.                                              0000579
+           MOVE '|'    TO ICOM-GLS-01 .
+           MOVE '|'    TO ICOM-GLS-02 .
+           MOVE '|'    TO ICOM-GLS-03 .
+           MOVE '|'    TO ICOM-GLS-04 .
+           MOVE '|'    TO ICOM-GLS-05 .
+           MOVE '|'    TO ICOM-GLS-06 .
+           MOVE '|'    TO ICOM-GLS-07 .
+           MOVE '|'    TO ICOM-GLS-08 .
+           MOVE '|'    TO ICOM-GLS-09 .
+           MOVE '|'    TO ICOM-GLS-10 .
+           MOVE '|'    TO ICOM-GLS-11 .
+           MOVE '|'    TO ICOM-GLS-12 .
+           MOVE '|'    TO ICOM-GLS-13 .
+           MOVE '|'    TO ICOM-GLS-14 .
+           MOVE '|'    TO ICOM-GLS-15 .
+           MOVE '|'    TO ICOM-GLS-16 .
+           MOVE '|'    TO ICOM-GLS-17 .
+           MOVE '|'    TO ICOM-GLS-18.
+       FIN-MOV-FIL-INFCOM.                                              0000579
+           EXIT.                                                        00004950
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00003450
+       LEE-TAB-USR SECTION.                                             000026
+       INI-LEE-TAB-USR.                                                 000026
+           MOVE SPACES TO TABLA-USR.                                    00002690
+           MOVE 0      TO WI-USR.                                       00002700
+           PERFORM LEER-TABUSR                                          00002710
+           IF TABUSR-FIN                                                00002720
+               DISPLAY 'ARCHIVO VACIO TAB-USR'                          00002730
+               GO TO FIN-LEE-TAB-USR                                    000027
+           END-IF.                                                      00002750
+           DISPLAY 'ARCHIVO DE EJECUTIVOS'
+           DISPLAY '==================== '.
+       LUP-LEE-TAB-USR.                                                 000027
+           ADD 1             TO WI-USR.                                 00002780
+           IF WI-USR > 30000
+               DISPLAY ' ERROR TABLA USR  > 30000'                        000025
+                PERFORM GNS-PRO-ABT                                     00002600
+           END-IF.
+
+           MOVE STAB-COD-USER TO  TUSR-COD-USER (WI-USR).
+           MOVE STAB-COD-BNCA TO  TUSR-COD-TBAN (WI-USR).
+           MOVE STAB-COD-OFUS TO  TUSR-COD-OFIC (WI-USR).
+           MOVE STAB-COD-PLAT TO  TUSR-COD-PLAT (WI-USR).
+           MOVE STAB-COD-REGL TO  TUSR-COD-REGL (WI-USR).               00001190
+       NXT-LEE-TAB-USR.                                                 000027
+           PERFORM LEER-TABUSR                                          00002800
+           IF NOT TABUSR-FIN                                            00002810
+              GO TO LUP-LEE-TAB-USR                                     000028
+            END-IF.                                                     00002830
+           DISPLAY 'TOTAL DEL EJECUTIVO:'  WI-USR.
+       FIN-LEE-TAB-USR.                                                 000028
+           EXIT.                                                        00002850
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       LEER-TABUSR  SECTION.                                            00004870
+       INI-LEER-TABUSR.                                                 00004880
+           READ TABUSR     AT END                                       00004890
+                MOVE '3' TO WR-ENT-TABUSR                               00004900
+                GO TO FIN-LEER-TABUSR                                   00004910
+           END-READ.                                                    00004920
+           ADD  1  TO WSS-NUM-LUSR.                                     00004930
+       FIN-LEER-TABUSR.                                                 00004940
+           EXIT.                                                        00004950
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       BUS-COD-EJC   SECTION.                                             000053
+       INI-BUS-COD-EJC.                                                   000054
+           MOVE 0      TO WI-TOP.                                       00005410
+           MOVE SPACES TO  ICOM-COD-TBAN-EJC
+           MOVE SPACES TO  ICOM-COD-OFIC-EJC
+           MOVE SPACES TO  ICOM-COD-OREG-EJC
+           MOVE SPACES TO  ICOM-COD-PLAT-EJC.
+       LUP-BUS-COD-EJC.                                                   000054
+           ADD 1 TO WI-TOP                                              00005450
+           IF WI-TOP  > WI-USR                                          00005460
+              GO TO FIN-BUS-COD-EJC                                       000054
+           END-IF.                                                      00005480
+
+           IF  TUSR-COD-USER (WI-TOP)  NOT = XDBC-COD-EJEC              00005500
+               GO TO LUP-BUS-COD-EJC                                      000055
+           END-IF.                                                      00005520
+
+           MOVE TUSR-COD-TBAN (WI-TOP) TO  ICOM-COD-TBAN-EJC
+           MOVE TUSR-COD-OFIC (WI-TOP) TO  ICOM-COD-OFIC-EJC
+           MOVE TUSR-COD-REGL (WI-TOP) TO  ICOM-COD-OREG-EJC
+           MOVE TUSR-COD-PLAT (WI-TOP) TO  ICOM-COD-PLAT-EJC.
+       FIN-BUS-COD-EJC.                                                   000055
+           EXIT.                                                        00005550
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440
+       PUT-REG-CTR SECTION.
+       INI-PUT-REG-CTR.
+           INITIALIZE REG-CTRC
+           MOVE PAR-FEC-FPRO  TO  CTRC-PERIODO
+           MOVE WSS-INF-GCLI  TO  CTRC-NUM-REGC
+           WRITE REG-CTRC.
+           IF   WS-STATUS-CTRCLI  NOT = 00
+                DISPLAY 'ERROR GRABAR CTRCLI   : '  WS-STATUS-CTRCLI
+                PERFORM GNS-PRO-ABT
+           END-IF.
+       FIN-PUT-REG-CTR.
+           EXIT.
+      *                                                                 00002440
+      *                                                                 00002440
+      *                                                                 00002440

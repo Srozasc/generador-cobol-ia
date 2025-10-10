@@ -1,0 +1,434 @@
+       IDENTIFICATION DIVISION.
+      *************************
+       PROGRAM-ID.    SUPPGPR1.
+       AUTHOR.        JGM.
+       DATE-WRITTEN.  AGO-2012.
+      *****************************************************************
+      * SISTEMA   : SUP                                               *
+      * SUBSISTEMA: SUP                                               *
+      * OBJETIVOS : CREA NUEVO REGISTROS COMERCIAL CON INTERES CTG    *
+      *****************************************************************
+      *                  M A N T E N C I O N E S                      *
+      *****************************************************************
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+      *=====================
+       SPECIAL-NAMES.
+           C01 IS CANAL-1
+           DECIMAL-POINT IS COMMA.
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+      *
+           SELECT CTACTG    ASSIGN        TO  CTACTG
+                            FILE STATUS   IS  WS-STATUS-CTACTG.
+      *
+           SELECT SUPD00    ASSIGN        TO  SUPD00
+                            FILE STATUS   IS  WS-STATUS-SUPD00.
+      *
+      *
+      *
+           SELECT SALD00    ASSIGN        TO  SALD00
+                            FILE STATUS   IS  WS-STATUS-SALD00.
+      *
+           SELECT SALINT    ASSIGN        TO  SALINT
+                            FILE STATUS   IS  WS-STATUS-SALINT.
+      *
+      *
+      * ==========================================================*
+       DATA DIVISION.
+       FILE SECTION.
+      *
+       FD  CTACTG                                                       00000400
+           LABEL RECORD IS STANDARD.                                    00000410
+       01  REG-CTACTG.                                                  00000420
+           05  ENT-CTA-CTG           PIC X(04).                         00000440
+           05  FILLER                PIC X(01).                         00000430
+           05  ENT-ORG-TCRED         PIC X(02).                         00000440
+           05  FILLER                PIC X(01).                         00000450
+           05  ENT-DES-TCRED         PIC X(02).                         00000440
+           05  FILLER                PIC X(01).                         00000450
+           05  ENT-GLS-DESC          PIC X(69).                         00000440
+      *                                                                 00000380
+      *                                                                 00000340
+       FD  SUPD00
+           LABEL RECORD IS OMITTED.
+       COPY SUPBRD0C.                                                   00000910
+      *
+      *
+       FD  SALD00
+           LABEL RECORD IS OMITTED.
+       COPY SUPBRD0C REPLACING ==REG-D0C.== BY ==REG-SAL.==.            00000910
+      *
+       FD  SALINT
+           LABEL RECORD IS OMITTED.
+       COPY SUPBRD0C REPLACING ==REG-D0C.== BY ==REG-INT.==.            00000910
+      *
+      *
+      ************************************************************
+      *
+      ************************************************************
+       WORKING-STORAGE SECTION.
+       COPY TDCBRMCF.
+      *FIO
+       COPY GNSWCFIO.
+       COPY GNSWVFIO.
+      *FIO
+      ************************************************************
+        01  WS-FILE-STATUS.
+            05  WS-STATUS-CTACTG          PIC 9(02).
+            05  WS-STATUS-SUPD00          PIC 9(02).
+            05  WS-STATUS-SALD00          PIC 9(02).
+            05  WS-STATUS-SALINT          PIC 9(02).
+      *
+       01 WSS-VAR.
+           03 WR-ENT-SUPD00           PIC X(01) VALUE  '0'.
+              88  SUPD00-FST                VALUE  '1'.
+              88  SUPD00-NXT                VALUE  '2'.
+              88  SUPD00-FIN                VALUE  '3'.
+                                                                        00001080
+           03 WR-ENT-CTACTG           PIC X(01) VALUE  '0'.
+              88  CTACTG-FST                VALUE  '1'.
+              88  CTACTG-NXT                VALUE  '2'.
+              88  CTACTG-FIN                VALUE  '3'.
+      *
+      *                                                                 00002010
+      *                                                                 00001160
+       01  TABLA-VAR.                                                   00001170
+           03  WI-TOP              PIC 9(03) VALUE 0.
+           03  WI-CTG              PIC 9(03) VALUE 0.
+           03  TABLA-CTG.                                               00001180
+               05  TABLA-MOV-VISA  OCCURS 100 TIMES.                    00001180
+                   10  VCTG-CTA-CTG    PIC X(04).                       0001190
+                   10  VCTG-ORG-CRED   PIC X(02).                       0001190
+                   10  VCTG-DES-CRED   PIC X(02).                       0001190
+                   10  VCTG-GLS-CTG    PIC X(40).                       0001190
+      *                                                                 00001160
+      *
+        01 WSS-NUM.
+           03 WSS-NUM-LCTG                PIC 9(08) VALUE 0.
+           03 WSS-NUM-LD00                PIC 9(08) VALUE 0.
+           03 WSS-NUM-GSAL                PIC 9(08) VALUE 0.
+           03 WSS-NUM-GINT                PIC 9(08) VALUE 0.
+           03 WSS-D00-NO-ACT              PIC 9(08) VALUE 0.
+           03 WSS-D00-SI-ACT              PIC 9(08) VALUE 0.
+           03 WSS-D00-NO-GRB              PIC 9(08) VALUE 0.
+           03 WSS-GRB-INT-CER             PIC 9(08) VALUE 0.
+           03 WSS-GRB-INT-SAL              PIC 9(08) VALUE 0.
+      *
+      *
+        01  CC-VAR.
+            03  CC-1        VALUE '1'      PIC X(01).
+            03  CC-4        VALUE '4'      PIC X(01).
+            03  CC-5        VALUE '5'      PIC X(01).
+            03  CC-N        VALUE 'N'      PIC X(01).
+            03  CC-S        VALUE 'S'      PIC X(01).
+            03  CC-P        VALUE 'P'      PIC X(01).
+            03  CC-E        VALUE 'E'      PIC X(01).
+            03  CC-B        VALUE 'B'      PIC X(01).
+      *
+
+       01  COB-VAR.                                                     00000480
+           03 COB-IND-CTG            PIC X(01).                          0000082
+           03 COB-ORG-TCRE           PIC X(02).                          0000082
+           03 COB-DES-TCRE           PIC X(02).                          0000082
+           03 COB-COD-CCTB           PIC X(04).                          0000082
+           03 COB-VAL-INT            PIC 9(13)     VALUE 0.              0000082
+      *
+        01  VAR-PARAME.
+           03 PAR-IND-INTERES              PIC X(01).
+      **************************************************************
+      *                   USER INFORMATION BLOCK                   *
+      **************************************************************
+      *
+       01  WB-UIB.
+           05  FILLER                       PIC X(32) VALUE 'SUPPGPR1'.
+      ************************************************************
+      *
+      ************************************************************
+       PROCEDURE DIVISION.
+      *------------------
+       INI-MAIN.
+           DISPLAY 'INICIO '.
+           PERFORM OPEN-FILES.
+           PERFORM LEE-CTA-CTG.
+           PERFORM ACCEP-PARAM.
+           PERFORM PROC-D00-COM.
+       NXT-MAIN.
+           PERFORM ESTADISTICA.
+           PERFORM CLOSE-FILES.
+       FIN-MAIN.
+           GOBACK.
+      *
+      *
+      *
+      *
+       ACCEP-PARAM SECTION.
+       INI-ACCEP-PARAM.
+           ACCEPT  PAR-IND-INTERES.
+           IF PAR-IND-INTERES = CC-S
+              DISPLAY ' SE AGREGA NUEVO REGISTRO ACTIVO CON INT'
+           END-IF.
+
+           IF PAR-IND-INTERES = CC-N
+              DISPLAY 'NO AGREGA NUEVO REGISTRO ACTIVO CON INT'
+              DISPLAY ' SE MUEVE CERO AL CAMPO INTERES CONTING'
+           END-IF.
+
+       FIN-ACCEP-PARAM.
+           EXIT.
+      *
+      *
+       LEE-CTA-CTG SECTION.                                             00002670
+       INI-LEE-CTA-CTG.                                                 00002680
+           MOVE LOW-VALUE TO TABLA-CTG .                                00002690
+           MOVE 0      TO WI-CTG                                        00002700
+
+           OPEN  INPUT  CTACTG
+           IF  WS-STATUS-CTACTG   > 0
+               DISPLAY ' ERROR OPEN CTACTG  :' WS-STATUS-CTACTG
+                PERFORM GNS-PRO-ABT
+           END-IF.
+
+           PERFORM LEER-CTACTG                                          00002710
+           IF CTACTG-FIN                                                00002720
+               DISPLAY 'ARCHIVO VACIO CTACTG'                           00002730
+               GO TO FIN-LEE-CTA-CTG                                    00002740
+           END-IF.                                                      00002750
+           DISPLAY 'CUENTAS CONTINGENTES '
+           DISPLAY '==================== '.
+       LUP-LEE-CTA-CTG.                                                 00002770
+           ADD 1             TO WI-CTG.                                 00002780
+           IF WI-CTG > 100
+               DISPLAY ' ERROR TABLA CTA-CTG  > 100 '                     000025
+                PERFORM GNS-PRO-ABT                                     00002600
+           END-IF.
+
+           MOVE ENT-CTA-CTG    TO VCTG-CTA-CTG (WI-CTG).                0002790
+           MOVE ENT-ORG-TCRED  TO VCTG-ORG-CRED(WI-CTG).                0002790
+           MOVE ENT-DES-TCRED  TO VCTG-DES-CRED(WI-CTG).                0002790
+           MOVE ENT-GLS-DESC   TO VCTG-GLS-CTG (WI-CTG).                0002790
+
+           DISPLAY ' CTA-CTG: ' VCTG-CTA-CTG (WI-CTG)
+                   ' TIPO CREDITO ORIGEN: ' VCTG-ORG-CRED (WI-CTG)
+                   ' TIPO CREDITO DESTINO: ' VCTG-DES-CRED (WI-CTG).
+       NXT-LEE-CTA-CTG.                                                 00002840
+           PERFORM LEER-CTACTG                                          00002800
+           IF NOT CTACTG-FIN                                            00002810
+              GO TO LUP-LEE-CTA-CTG                                     00002820
+            END-IF.                                                     00002830
+           CLOSE CTACTG.
+       FIN-LEE-CTA-CTG.                                                 00002840
+           EXIT.                                                        00002850
+      *                                                                 00002440
+      *
+      *
+       BUS-CTA-CTG  SECTION.                                             0000539
+       INI-BUS-CTA-CTG .                                                 0000540
+           MOVE 0      TO WI-TOP.                                       00005410
+           MOVE CC-N   TO COB-IND-CTG.                                  00005420
+           MOVE SPACES TO COB-DES-TCRE.
+       LUP-BUS-CTA-CTG.                                                  0000544
+           ADD 1 TO WI-TOP                                              00005450
+           IF WI-TOP  > WI-CTG                                          00005460
+              GO TO FIN-BUS-CTA-CTG                                      0000547
+           END-IF.                                                      00005480
+           IF  VCTG-CTA-CTG (WI-TOP)  = COB-COD-CCTB AND
+               VCTG-ORG-CRED (WI-TOP) = COB-ORG-TCRE
+                MOVE CC-S                    TO COB-IND-CTG             00005510
+                MOVE VCTG-DES-CRED (WI-TOP)  TO COB-DES-TCRE
+                GO TO FIN-BUS-CTA-CTG                                    0000554
+           END-IF.
+           GO TO LUP-BUS-CTA-CTG.                                        0000547
+       FIN-BUS-CTA-CTG.                                                  0000554
+           EXIT.                                                        00005550
+      *
+      *
+      *
+       PROC-D00-COM  SECTION.
+       INI-PROC-D00-COM.
+           PERFORM LEER-SUPD00.
+           IF SUPD00-FIN
+               DISPLAY 'ARCHIVO VACIO VISA NAC'
+               GO TO FIN-PROC-D00-COM
+           END-IF.
+       LUP-PROC-D00-COM.
+           MOVE  REG-D0C                TO REG-SAL.
+           MOVE D0C-COD-CCTB IN REG-D0C TO COB-COD-CCTB
+           MOVE D0C-IND-TCRE IN REG-D0C TO COB-ORG-TCRE
+
+           PERFORM BUS-CTA-CTG
+           IF COB-IND-CTG = CC-N                                        00005420
+              ADD  1   TO WSS-D00-NO-ACT
+              PERFORM PUT-REG-SAL
+              GO TO NXT-PROC-D00-COM
+           END-IF.
+
+           COMPUTE COB-VAL-INT =  D0C-VAL-IPCO IN REG-D0C +
+                                  D0C-VAL-IPCV IN REG-D0C.
+
+           IF COB-VAL-INT NOT > 0
+              ADD  1   TO WSS-D00-NO-ACT
+              PERFORM PUT-REG-SAL
+              GO TO NXT-PROC-D00-COM
+           END-IF.
+
+           MOVE REG-D0C      TO REG-SAL.
+           MOVE ZEROES       TO D0C-VAL-IPCO IN REG-SAL
+           MOVE ZEROES       TO D0C-VAL-IPCV IN REG-SAL
+           MOVE REG-SAL      TO REG-INT.
+           PERFORM PUT-REG-SAL.
+           PERFORM PUT-REG-INT.
+           ADD 1  TO WSS-GRB-INT-CER.
+           ADD 1  TO WSS-D00-SI-ACT
+
+
+           IF PAR-IND-INTERES = CC-N
+              ADD  1   TO WSS-D00-NO-GRB
+              GO TO NXT-PROC-D00-COM
+           END-IF.
+
+           MOVE REG-D0C      TO REG-SAL.
+           MOVE COB-VAL-INT  TO D0C-VAL-SCON IN REG-SAL.
+           MOVE COB-DES-TCRE TO D0C-IND-TCRE IN REG-SAL
+           MOVE ZEROES       TO D0C-VAL-SMO1 IN REG-SAL
+           MOVE ZEROES       TO D0C-VAL-SMO2 IN REG-SAL
+           MOVE ZEROES       TO D0C-VAL-SCVC IN REG-SAL
+           MOVE ZEROES       TO D0C-VAL-IPCO IN REG-SAL
+           MOVE ZEROES       TO D0C-VAL-IPCV IN REG-SAL
+           MOVE ZEROES       TO D0C-VAL-RDEV IN REG-SAL
+           MOVE ZEROES       TO D0C-VAL-SREP IN REG-SAL.
+           MOVE REG-SAL      TO REG-INT.
+
+           PERFORM PUT-REG-SAL.
+           PERFORM PUT-REG-INT.
+           ADD 1  TO WSS-GRB-INT-SAL.
+       NXT-PROC-D00-COM.
+           PERFORM LEER-SUPD00.
+           IF NOT SUPD00-FIN
+              GO TO LUP-PROC-D00-COM
+           END-IF.
+       FIN-PROC-D00-COM.
+           EXIT.
+      *
+      *
+      *
+      *
+       PUT-REG-SAL SECTION.
+       INI-PUT-REG-SAL.
+           WRITE REG-SAL.
+           IF  WS-STATUS-SALD00   > 0
+               DISPLAY ' ERROR WRITW SALD00 :' WS-STATUS-SALD00
+                PERFORM GNS-PRO-ABT
+           END-IF.
+           ADD 1  TO WSS-NUM-GSAL.
+       FIN-PUT-REG-SAL.
+           EXIT.
+      *
+      *
+      *
+      *
+      *
+       PUT-REG-INT SECTION.
+       INI-PUT-REG-INT.
+           WRITE REG-INT.
+           IF  WS-STATUS-SALINT   > 0
+               DISPLAY ' ERROR WRITW INT    :' WS-STATUS-SALINT
+                PERFORM GNS-PRO-ABT
+           END-IF.
+       FIN-PUT-REG-SAL.
+           EXIT.
+      *
+      *
+       LEER-CTACTG SECTION.
+       INI-LEER-CTACTG.
+           READ CTACTG   AT END
+                MOVE '3' TO WR-ENT-CTACTG
+                GO TO FIN-LEER-CTACTG
+           END-READ.
+           ADD 1  TO WSS-NUM-LCTG.
+       FIN-LEER-CTACTG.
+           EXIT.
+      *
+      *
+      *
+      *
+      *
+       LEER-SUPD00 SECTION.
+       INI-LEER-SUPD00.
+           READ SUPD00   AT END
+                MOVE '3' TO WR-ENT-SUPD00
+                GO TO FIN-LEER-SUPD00
+           END-READ.
+           ADD 1 TO WSS-NUM-LD00.
+       FIN-LEER-SUPD00.
+           EXIT.
+      *
+      *
+      *
+       OPEN-FILES SECTION.
+       INI-OPEN-FILES.
+           MOVE CC-1   TO WR-ENT-SUPD00.
+
+           OPEN  INPUT  SUPD00
+           IF  WS-STATUS-SUPD00   > 0
+               DISPLAY ' ERROR OPEN SUPD00  :' WS-STATUS-SUPD00
+                PERFORM GNS-PRO-ABT
+           END-IF.
+
+           OPEN  OUTPUT SALD00
+           IF  WS-STATUS-SALD00   > 0
+               DISPLAY ' ERROR OPEN SALD00  :' WS-STATUS-SALD00
+                PERFORM GNS-PRO-ABT
+           END-IF.
+           OPEN  OUTPUT SALINT
+           IF  WS-STATUS-SALINT   > 0
+               DISPLAY ' ERROR OPEN SALINT  :' WS-STATUS-SALINT
+                PERFORM GNS-PRO-ABT
+           END-IF.
+
+       FIN-OPEN-FILES-INP.
+           EXIT.
+      *
+      *
+      *
+       CLOSE-FILES SECTION.
+       INI-CLOSE-FILES.
+           CLOSE  SUPD00.
+           CLOSE  SALD00.
+           CLOSE  SALINT.
+       FIN-CLOSE-FILES.
+           EXIT.
+
+
+      *
+      *
+      *
+       ESTADISTICA SECTION.
+       INI-ESTADISTICA.
+           DISPLAY '============================'
+           DISPLAY '*  PROGRAMA :  SUPPGPR1 '.
+           DISPLAY '*  VERSION..:  V01 (OCTUBRE-2012'.
+           DISPLAY '*  SISTEMA..:  TDC..........'
+           DISPLAY '*  OBJETIVO.:                             '
+           DISPLAY '*  1) CREAR REG ACTIVO PARA CUENTAS CTG.......'
+           DISPLAY '*  1) ELIMINA INTERES CREDITOS CTG............'
+           DISPLAY '================================================'
+           DISPLAY ' ENTRADA(SUP-D00-COM  ) : ' WSS-NUM-LD00.
+           DISPLAY ' SALIDA................ : ' WSS-NUM-GSAL.
+           DISPLAY '================================================'
+           DISPLAY ' REG.NO ACTUALIZADOS ...: ' WSS-D00-NO-ACT
+           DISPLAY ' REG.SI ACTUALIZADOS ...: ' WSS-D00-SI-ACT
+           DISPLAY '================================================'.
+           DISPLAY ' REG GRABADO CON INT=0..: ' WSS-GRB-INT-CER.
+           DISPLAY ' REG GRABADO CON INT>0..: ' WSS-GRB-INT-SAL.
+           DISPLAY '================================================'.
+       FIN-ESTADISTICA.
+           EXIT.
+      *
+      *
+      *
+      *
+       COPY GNSBTABT.
+       COPY GNSBGABT.
+       COPY GNSBGEND.

@@ -1,0 +1,1916 @@
+       IDENTIFICATION DIVISION.
+      *************************
+       PROGRAM-ID.    SUPPGNF4.
+       AUTHOR.        INGEDAT.
+       DATE-WRITTEN.  ENE-2022.
+      *****************************************************************
+      * SISTEMA   : GENERA INTERFAZ  DE D00DEU S /SEGMENTACION.TXT
+      * SUBSISTEMA: SUP                                               *
+      * OBJETIVOS : PROVISIONES                                       *
+      *****************************************************************
+      *                  M A N T E N C I O N E S                      *
+      * FECHA      RESPONSABLE MOTIVO                                 *
+      *****************************************************************
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+      *=====================
+       SPECIAL-NAMES.
+           DECIMAL-POINT IS COMMA.
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+      *****************************************************************
+      *
+           SELECT CLIESP     ASSIGN       TO  CLIESP
+                             FILE STATUS  IS  WS-STATUS-CLIESP.
+      *
+      * -----------------  E N T R A D A -----------------------*
+           SELECT PRVMES     ASSIGN       TO  PRVMES
+                             FILE STATUS  IS  WS-STATUS-PRVMES.
+      *
+           SELECT CALIND     ASSIGN       TO  CALIND
+                             FILE STATUS  IS  WS-STATUS-CALIND.
+      * ----------------------------------------------------------*
+      *
+           SELECT FACCLI     ASSIGN       TO  FACCLI
+                             FILE STATUS  IS  WS-STATUS-FACCLI.
+      *
+           SELECT FACDEU     ASSIGN       TO  FACDEU
+                             FILE STATUS  IS  WS-STATUS-FACDEU.
+      *
+           SELECT D00DEU     ASSIGN       TO  D00DEU
+                             FILE STATUS  IS  WS-STATUS-D00DEU.
+      *
+           SELECT CLISEG     ASSIGN       TO  CLISEG
+                             FILE STATUS  IS  WS-STATUS-CLISEG.
+      *
+           SELECT ENTGRP     ASSIGN       TO  ENTGRP
+                             FILE STATUS  IS  WS-STATUS-ENTGRP.
+      *
+      * -----------------  S A L I D A -------------------------*
+           SELECT SEGFAC     ASSIGN       TO  SEGFAC
+                             FILE STATUS  IS  WS-STATUS-SEGFAC.
+      *
+           SELECT SALFAC     ASSIGN       TO  SALFAC
+                             FILE STATUS  IS  WS-STATUS-SALFAC.
+      *
+      *
+           SELECT MESFAC     ASSIGN       TO  MESFAC
+                             FILE STATUS  IS  WS-STATUS-MESFAC.
+      *
+      * ==========================================================*
+           SELECT SALINF     ASSIGN       TO  SALINF
+                             FILE STATUS  IS  WS-STATUS-SALINF.
+      *
+           SELECT SEGNEW     ASSIGN       TO  SEGNEW
+                             FILE STATUS  IS  WS-STATUS-SEGNEW.
+      *
+      * ==========================================================*
+       DATA DIVISION.
+      **************
+       FILE SECTION.
+      *
+      *
+       FD  CLIESP
+           LABEL RECORD IS STANDARD.
+       01  REG-CLIESP.
+           05  CLIESP-FEC-FPRO       PIC X(08).
+           05  FILLER                PIC X(01).
+           05  CLIESP-FEC-FPER       PIC X(06).
+           05  FILLER                PIC X(01).
+           05  CLIESP-NUM-RUTD       PIC X(09).
+           05  FILLER                PIC X(01).
+           05  CLIESP-COD-SEGM       PIC X(01).
+           05  FILLER                PIC X(01).
+      *
+      *
+       FD  FACCLI
+           LABEL RECORD IS OMITTED.
+       01  REG-FAC-CLI.
+           03  FACCLI-OPE-FEC-FPER.
+               05  FACCLI-OPE-FEC-FPER1   PIC X(06).
+               05  FACCLI-OPE-FEC-FPERD   PIC X(02).
+           03  FACCLI-FIL-001             PIC X(01).
+           03  FACCLI-OPE-NUM-RUT         PIC X(09).
+           03  FACCLI-FIL-002             PIC X(01).
+           03  FACCLI-OPE-CIC-OPE         PIC X(20).
+           03  FACCLI-FIL-003             PIC X(01).
+           03  FACCLI-OPE-IND-DEU         PIC X(01).
+           03  FACCLI-FIL-004             PIC X(01).
+           03  FACCLI-OPE-IND-RES         PIC X(01).
+           03  FACCLI-FIL-005             PIC X(01).
+           03  FACCLI-OPE-COD-DOC         PIC X(02).
+           03  FACCLI-FIL-006             PIC X(01).
+           03  FACCLI-OPE-TOT-SDO         PIC 9(15).
+           03  FACCLI-FIL-007             PIC X(01).
+           03  FACCLI-OPE-COD-CAL         PIC X(02).
+           03  FACCLI-FIL-008             PIC X(01).
+           03  FACCLI-OPE-COD-SEG         PIC X(01).
+           03  FACCLI-FIL-009             PIC X(01).
+           03  FACCLI-OPE-IND-CDE         PIC X(01).
+           03  FACCLI-FIL-010             PIC X(01).
+           03  FACCLI-COD-TBAN            PIC X(03).
+           03  FACCLI-FIL-011X            PIC X(01).
+           03  FACCLI-COD-SBIF            PIC X(02).
+           03  FACCLI-FIL-012X            PIC X(01).
+           03  FACCLI-IND-TBAN-IND        PIC X(01).
+           03  FACCLI-FIL-013X            PIC X(01).
+      *
+      *
+       FD  D00DEU
+           LABEL RECORD IS OMITTED.
+       01 REG-EDEU.
+          03 D00-DEU-FEC-FPRO                         PIC X(08).
+          03 D00-DEU-GLS-01                           PIC X(01).
+          03 D00-DEU-FEC-FPER                         PIC X(06).
+          03 D00-DEU-GLS-02                           PIC X(01).
+          03 D00-DEU-NUM-RUTD                         PIC X(09).
+          03 D00-DEU-GLS-03                           PIC X(01).
+          03 D00-DEU-VRF-RUT                          PIC X(01).
+          03 D00-DEU-GLS-04                           PIC X(01).
+          03 D00-DEU-COD-TBAN                         PIC X(03).
+          03 D00-DEU-GLS-05                           PIC X(01).
+          03 D00-DEU-IND-CDET                         PIC X(01).
+          03 D00-DEU-GLS-06                           PIC X(01).
+          03 D00-DEU-COD-CALI                         PIC X(02).
+          03 D00-DEU-GLS-07                           PIC X(01).
+          03 D00-DEU-COD-CLAS                         PIC X(01).
+          03 D00-DEU-GLS-08                           PIC X(01).
+          03 D00-DEU-DEU-COM-ACT                      PIC 9(18).
+          03 D00-DEU-GLS-09                           PIC X(01).
+          03 D00-DEU-DEU-COM-CTG                      PIC 9(18).
+          03 D00-DEU-GLS-10                           PIC X(01).
+          03 D00-DEU-DEU-CTG-FCC                      PIC 9(18).
+          03 D00-DEU-GLS-11                           PIC X(01).
+          03 D00-DEU-VAL-DEU-FAC                      PIC 9(18).
+          03 D00-DEU-GLS-12                           PIC X(01).
+          03 D00-DEU-VAL-DEU-WOL                      PIC 9(18).
+          03 D00-DEU-GLS-13                           PIC X(01).
+          03 D00-DEU-DEU-COM-CAE                      PIC 9(18).
+          03 D00-DEU-GLS-14                           PIC X(01).
+          03 D00-DEU-DEU-COM-CON                      PIC 9(18).
+          03 D00-DEU-GLS-15                           PIC X(01).
+          03 D00-DEU-DEU-COM-OTR                      PIC 9(18).
+          03 D00-DEU-GLS-16                           PIC X(01).
+      *
+      *
+      *
+       FD  FACDEU
+           LABEL RECORD IS OMITTED.
+       01  REG-FACDEU .
+           03  FAC-DEU-FEC-FPER.
+               05  FAC-DEU-NUM-SPER        PIC X(02).
+               05  FAC-DEU-NUM-APER        PIC X(02).
+               05  FAC-DEU-NUM-MPER        PIC X(02).
+               05  FAC-DEU-NUM-DPER        PIC X(02).
+           03  FAC-DEU-FIL-001             PIC X(01).
+           03  FAC-DEU-NUM-RUT             PIC 9(09).
+           03  FAC-DEU-FIL-002             PIC X(01).
+           03  FAC-DEU-CIC-OPE             PIC X(20).
+           03  FAC-DEU-FIL-003             PIC X(01).
+           03  FAC-DEU-IND-DEU             PIC X(01).
+           03  FAC-DEU-FIL-004             PIC X(01).
+           03  FAC-DEU-IND-RES             PIC X(01).
+           03  FAC-DEU-FIL-005             PIC X(01).
+           03  FAC-DEU-COD-DOC             PIC X(02).
+           03  FAC-DEU-FIL-006             PIC X(01).
+           03  FAC-DEU-TOT-SDO             PIC 9(15).
+           03  FAC-DEU-FIL-007             PIC X(01).
+           03  FAC-DEU-COD-CAL             PIC X(02).
+           03  FAC-DEU-FIL-008             PIC X(01).
+           03  FAC-DEU-COD-SEG             PIC X(01).
+           03  FAC-DEU-FIL-009             PIC X(01).
+           03  FAC-DEU-COD-CDE             PIC X(01).
+           03  FAC-DEU-FIL-010             PIC X(01).
+           03  FAC-DEU-COD-TBAN            PIC X(03).
+           03  FAC-DEU-FIL-011X            PIC X(01).
+           03  FAC-DEU-COD-SBIF            PIC X(02).
+           03  FAC-DEU-FIL-012X            PIC X(01).
+           03  FAC-DEU-IND-TBAN-IND        PIC X(01).
+           03  FAC-DEU-FIL-013X            PIC X(01).
+      *
+      *
+       FD  ENTGRP
+           LABEL RECORD IS OMITTED.
+       01  REG-ENTGRP.
+           03  CLI-GRP-FEC-FPER.
+               05  CLI-GRP-NUM-SPER        PIC X(02).
+               05  CLI-GRP-NUM-APER        PIC X(02).
+               05  CLI-GRP-NUM-MPER        PIC X(02).
+               05  CLI-GRP-NUM-DPER        PIC X(02).
+           03  XXX-GRU-001                 PIC X(01).
+           03  CLI-GRP-NUM-RUT             PIC X(09).
+           03  XXX-GRU-002                 PIC X(01).
+           03  CLI-GRP-VRF-RUT             PIC X(01).
+           03  XXX-GRU-003                 PIC X(01).
+           03  CLI-GRP-COD-GRUP            PIC X(04).
+           03  XXX-GRU-004                 PIC X(01).
+           03  CLI-GRP-COD-CMF             PIC X(04).
+           03  XXX-GRU-005                 PIC X(01).
+           03  CLI-GRP-GRU-EMPR            PIC X(40).
+           03  XXX-GRU-006                 PIC X(01).
+           03  CLI-GRP-GRU-NOMB            PIC X(50).
+           03  XXX-GRU-007                 PIC X(01).
+           03  CLI-GRP-MTO-DEU             PIC X(20).
+           03  XXX-GRU-008                 PIC X(01).
+      *
+      *
+       FD  CLISEG
+           LABEL RECORD IS OMITTED.
+       01  REG-CLISEG.
+           03  CLISEG-FEC-FPRO                PIC X(08).
+           03  CLISEG-FIL-001                 PIC X(01).
+           03  CLISEG-FEC-FPER                PIC X(06).
+           03  CLISEG-FIL-002                 PIC X(01).
+           03  CLISEG-NUM-RUTD                PIC X(09).
+           03  CLISEG-FIL-003                 PIC X(01).
+           03  CLISEG-VRF-RUTD                PIC X(01).
+           03  CLISEG-FIL-004                 PIC X(01).
+           03  CLISEG-COD-SEGM                PIC X(01).
+           03  CLISEG-FIL-005                 PIC X(01).
+           03  CLISEG-CIC-ICLI                PIC X(12).
+           03  CLISEG-FIL-006                 PIC X(01).
+      *
+      *
+      *
+      *
+       FD  PRVMES
+           LABEL RECORD IS STANDARD.
+       01  REG-PRVMES.
+           05  PRVMES-IND-PROC       PIC X(02).
+           05  FILLER                PIC X(01).
+           05  PRVMES-NUM-MES        PIC X(02).
+           05  FILLER                PIC X(01).
+           05  PRVMES-GLS-MES        PIC X(10).
+           05  FILLER                PIC X(64).
+      *
+      *
+      *
+       FD  CALIND
+           LABEL RECORD IS STANDARD.
+       01  REG-CALIND.
+           05  FILLER                PIC X(20).
+           05  CAL-COD-SBIF          PIC X(02).
+           05  FILLER                PIC X(58).
+      *
+      *
+       FD  SALFAC
+           LABEL RECORD IS STANDARD.
+       01 REG-SAL-FAC.
+          03 SFAC-FEC-FPRO                         PIC X(08).
+          03 SFAC-GLS-01                           PIC X(01).
+          03 SFAC-FEC-FPER                         PIC X(06).
+          03 SFAC-GLS-02                           PIC X(01).
+          03 SFAC-NUM-RUTD                         PIC X(09).
+          03 SFAC-GLS-03                           PIC X(01).
+          03 SFAC-VRF-RUT                          PIC X(01).
+          03 SFAC-GLS-04                           PIC X(01).
+          03 SFAC-COD-TBAN                         PIC X(03).
+          03 SFAC-GLS-05                           PIC X(01).
+          03 SFAC-GLS-TBAN                         PIC X(08).
+          03 SFAC-GLS-06                           PIC X(01).
+          03 SFAC-IND-CDET                         PIC X(01).
+          03 SFAC-GLS-07                           PIC X(01).
+          03 SFAC-COD-CALI                         PIC X(02).
+          03 SFAC-GLS-08                           PIC X(01).
+          03 SFAC-COD-CLAS                         PIC X(01).
+          03 SFAC-GLS-09                           PIC X(01).
+          03 SFAC-DEU-TOT-D00                      PIC 9(18).
+          03 SFAC-GLS-10                           PIC X(01).
+          03 SFAC-DEU-TOT-CTG                      PIC 9(18).
+          03 SFAC-GLS-11                           PIC X(01).
+          03 SFAC-DEU-TOT-WOL                      PIC 9(18).
+          03 SFAC-GLS-12                           PIC X(01).
+          03 SFAC-DEU-TOT-FAC                      PIC 9(18).
+          03 SFAC-GLS-13                           PIC X(01).
+          03 SFAC-NUM-PDO                          PIC 9(02).
+          03 SFAC-GLS-14                           PIC X(01).
+          03 SFAC-DEU-PDO                          PIC 9(18).
+          03 SFAC-GLS-15                           PIC X(01).
+      *
+      *
+
+
+       FD  SEGFAC                                                        0000047
+           LABEL RECORD IS OMITTED.                                     00000480
+       01 REG-SEGFAC.                                                    0000050
+          03 SEGFAC-NUM-RUTD                         PIC X(09).            00000
+          03 SEGFAC-GLS-01                           PIC X(01).            00000
+          03 SEGFAC-CIC-ICLI                         PIC X(12).            00000
+          03 SEGFAC-GLS-02                           PIC X(01).            00000
+          03 SEGFAC-COD-TBAN                         PIC X(03).            00000
+          03 SEGFAC-GLS-03                           PIC X(01).            00000
+          03 SEGFAC-NUM-MESES                        PIC 9(05).            00000
+          03 SEGFAC-GLS-04                           PIC X(01).            00000
+          03 SEGFAC-VAL-CMAX                         PIC 9(17).            00000
+          03 SEGFAC-GLS-05                           PIC X(01).            00000
+          03 SEGFAC-VAL-TDEU                         PIC 9(17).            00000
+          03 SEGFAC-GLS-06                           PIC X(01).            00000
+          03 SEGFAC-COD-SEGM                         PIC X(01).            00000
+          03 SEGFAC-GLS-07                           PIC X(01).            00000
+      *                                                                 00000040
+       FD  MESFAC
+           LABEL RECORD IS OMITTED.
+       01 REG-MFAC.
+          03 MFAC-DEU-FEC-FPRO                     PIC X(08).
+          03 MFAC-DEU-GLS-01                       PIC X(01).
+          03 MFAC-DEU-FEC-FPER                     PIC X(06).
+          03 MFAC-DEU-GLS-02                       PIC X(01).
+          03 MFAC-DEU-NUM-RUTD                     PIC X(09).
+          03 MFAC-DEU-GLS-03                       PIC X(01).
+          03 MFAC-DEU-VRF-RUTD                     PIC X(01).
+          03 MFAC-DEU-GLS-04                       PIC X(01).
+          03 MFAC-DEU-COD-TBAN                     PIC X(03).
+          03 MFAC-DEU-GLS-05                       PIC X(01).
+          03 MFAC-DEU-IND-CDET                     PIC X(01).
+          03 MFAC-DEU-GLS-06                       PIC X(01).
+          03 MFAC-DEU-COD-CALI                     PIC X(02).
+          03 MFAC-DEU-GLS-07                       PIC X(01).
+          03 MFAC-DEU-COD-CLAS                     PIC X(01).
+          03 MFAC-DEU-GLS-08                       PIC X(01).
+          03 MFAC-DEU-COM-ACT                      PIC 9(18).
+          03 MFAC-DEU-GLS-09                       PIC X(01).
+          03 MFAC-DEU-COM-CTG                      PIC 9(18).
+          03 MFAC-DEU-GLS-10                       PIC X(01).
+          03 MFAC-DEU-CTG-FCC                      PIC 9(18).
+          03 MFAC-DEU-GLS-11                       PIC X(01).
+          03 MFAC-DEU-FAC                          PIC 9(18).
+          03 MFAC-DEU-GLS-12                       PIC X(01).
+          03 MFAC-DEU-WOL                          PIC 9(18).
+          03 MFAC-DEU-GLS-13                       PIC X(01).
+          03 MFAC-DEU-COM-CAE                      PIC 9(18).
+          03 MFAC-DEU-GLS-14                       PIC X(01).
+          03 MFAC-DEU-COM-CON                      PIC 9(18).
+          03 MFAC-DEU-GLS-15                       PIC X(01).
+          03 MFAC-DEU-COM-OTR                      PIC 9(18).
+          03 MFAC-DEU-GLS-16                       PIC X(01).
+      *                                                                 00000040
+
+       FD  SALINF                                                        0000047
+           LABEL RECORD IS OMITTED.                                     00000480
+       01 REG-INF-CLI.                                                   0000050
+          03 SAL-INF-FEC-FPRO                         PIC X(08).        0000051
+          03 SAL-INF-GLS-00                           PIC X(01).        0000051
+          03 SAL-INF-NUM-RUTD                         PIC X(09).            0000
+          03 SAL-INF-GLS-01                           PIC X(01).            0000
+          03 SAL-INF-CIC-ICLI                         PIC X(12).            0000
+          03 SAL-INF-GLS-02                           PIC X(01).            0000
+          03 SAL-INF-COD-CALIF                        PIC X(02).            0000
+          03 SAL-INF-GLS-03                           PIC X(01).            0000
+          03 SAL-INF-IND-CDEGRU                       PIC X(01).            0000
+          03 SAL-INF-GLS-04                           PIC X(01).            0000
+          03 SAL-INF-COD-TBAN                         PIC X(03).            0000
+          03 SAL-INF-GLS-05                           PIC X(01).            0000
+          03 SAL-INF-COD-TBAN-IND                     PIC X(01).            0000
+          03 SAL-INF-GLS-06                           PIC X(01).            0000
+          03 SAL-INF-COD-SEGM-OLD                     PIC X(01).
+          03 SAL-INF-GLS-07                           PIC X(01).            0000
+          03 SAL-INF-COD-SEGM-NEW                     PIC X(01).
+          03 SAL-INF-GLS-08                           PIC X(01).            0000
+          03 SAL-INF-GRUP-IND                         PIC X(01).            0000
+          03 SAL-INF-GLS-09                           PIC X(01).            0000
+          03 SAL-INF-VAL-TDEU-D00                     PIC 9(17).            0000
+          03 SAL-INF-GLS-10                           PIC X(01).            0000
+          03 SAL-INF-VAL-TDEU-FAC                     PIC 9(17).            0000
+          03 SAL-INF-GLS-11                           PIC X(01).            0000
+          03 SAL-INF-VAL-TDEU-WOL                     PIC 9(17).            0000
+          03 SAL-INF-GLS-12                           PIC X(01).            0000
+          03 SAL-INF-VAL-TDEU-MES                     PIC 9(17).            0000
+          03 SAL-INF-GLS-10                           PIC X(01).            0000
+          03 SAL-INF-PRO-DEU-MES6                     PIC 9(17).             000
+          03 SAL-INF-GLS-11                           PIC X(01).            0000
+          03 SAL-INF-GLS-SEGMENTA                     PIC X(17).            0000
+          03 SAL-INF-GLS-12                           PIC X(01).            0000
+          03 INF-CCC-MES-PDO                          PIC 9(02).            0000
+          03 SAL-INF-GLS-13                           PIC X(01).            0000
+      *                                                                 00000040
+      *                                                                 00000040
+       FD  SEGNEW                                                         0
+           LABEL RECORD IS OMITTED.                                     000
+       01  REG-SEGNEW.                                                   00
+           03  SEGNEW-FEC-FPRO                PIC X(08).
+           03  SEGNEW-FIL-001                 PIC X(01).
+           03  SEGNEW-FEC-FPER                PIC X(06).
+           03  SEGNEW-FIL-002                 PIC X(01).
+           03  SEGNEW-NUM-RUTD                PIC X(09).
+           03  SEGNEW-FIL-003                 PIC X(01).
+           03  SEGNEW-VRF-RUTD                PIC X(01).
+           03  SEGNEW-FIL-004                 PIC X(01).
+           03  SEGNEW-COD-SEGM                PIC X(01).
+           03  SEGNEW-FIL-005                 PIC X(01).
+           03  SEGNEW-CIC-ICLI                PIC X(12).
+           03  SEGNEW-FIL-006                 PIC X(01).
+      *                                                                 00000750
+      *                                                                 00000040
+      ************************************************************
+       WORKING-STORAGE SECTION.
+      ************************************************************
+      *FIO
+       COPY GNSWGRQA REPLACING ==ADR-REQA== BY ==ADR-MSG-REQA==.
+       COPY GNSWGRQA REPLACING ==ADR-REQA== BY ==ADR-MSC-REQA==.
+       COPY GNSWGRQA REPLACING ==ADR-REQA== BY ==ADR-TAB-REQA==.
+       COPY GNSBRMSG.
+       COPY GNSWGPES.
+       COPY GNSBRMSC.
+       COPY GNSBRTAB.
+
+       COPY TABBRCAM.
+       COPY TABBRCOM.
+       COPY GNSWGRQA REPLACING ==ADR-REQA== BY ==ADR-CAM-REQA==.
+
+       COPY TABWGTVC.
+       COPY GNSWGRQA.
+       COPY GNSWGUIB.
+       COPY GNSWGELS.
+       COPY GNSWCFIO.
+       COPY GNSWVFIO.
+       COPY GNSWVIDD.
+       COPY GNSWGSYS.
+       COPY GNSWGFEC.
+       COPY GNSWGHOY.
+       COPY GNSWGCPT.
+
+      *FIO
+      *
+        01  WS-FILE-STATUS.
+            05  WS-STATUS-FACCLI           PIC 9(02).
+            05  WS-STATUS-D00DEU           PIC 9(02).
+            05  WS-STATUS-CLISEG           PIC 9(02).
+            05  WS-STATUS-ENTGRP           PIC 9(02).
+            05  WS-STATUS-PRVMES           PIC 9(02).
+            05  WS-STATUS-CALIND           PIC 9(02).
+            05  WS-STATUS-SALFAC           PIC 9(02).
+            05  WS-STATUS-FACDEU           PIC 9(02).
+            05  WS-STATUS-SEGFAC           PIC 9(02).
+            05  WS-STATUS-MESFAC           PIC 9(02).
+      *
+            05  WS-STATUS-SALINF           PIC 9(02).
+            05  WS-STATUS-SEGNEW           PIC 9(02).
+            05  WS-STATUS-CLIESP           PIC 9(02).
+      *
+       01 WSS-VAR.
+           03 WR-ENT-CLIESP         PIC X(01) VALUE  '0'.
+              88  CLIESP-FST                VALUE  '1'.
+              88  CLIESP-NXT                VALUE  '2'.
+              88  CLIESP-FIN                VALUE  '3'.
+      *
+           03 WR-ENT-FACCLI         PIC X(01) VALUE  '0'.
+              88  FACCLI-FST                VALUE  '1'.
+              88  FACCLI-NXT                VALUE  '2'.
+              88  FACCLI-FIN                VALUE  '3'.
+      *
+           03 WR-ENT-FACDEU         PIC X(01) VALUE  '0'.
+              88  FACDEU-FST                VALUE  '1'.
+              88  FACDEU-NXT                VALUE  '2'.
+              88  FACDEU-FIN                VALUE  '3'.
+      *
+           03 WR-ENT-D00DEU         PIC X(01) VALUE  '0'.
+              88  D00DEU-FST                VALUE  '1'.
+              88  D00DEU-NXT                VALUE  '2'.
+              88  D00DEU-FIN                VALUE  '3'.
+      *
+           03 WR-ENT-CLISEG         PIC X(01) VALUE  '0'.
+              88  CLISEG-FST                VALUE  '1'.
+              88  CLISEG-NXT                VALUE  '2'.
+              88  CLISEG-FIN                VALUE  '3'.
+      *
+           03 WR-ENT-ENTGRP         PIC X(01) VALUE  '0'.
+              88  ENTGRP-FST                VALUE  '1'.
+              88  ENTGRP-NXT                VALUE  '2'.
+              88  ENTGRP-FIN                VALUE  '3'.
+      *
+      *
+           03 WR-ENT-CALIND         PIC X(01) VALUE  '0'.
+              88 CALIND-FST                VALUE  '1'.
+              88 CALIND-NXT                VALUE  '2'.
+              88 CALIND-FIN                VALUE  '3'.
+      *
+           03 WR-ENT-PRVMES         PIC X(01) VALUE  '0'.
+              88  PRVMES-FST                VALUE  '1'.
+              88  PRVMES-NXT                VALUE  '2'.
+              88  PRVMES-FIN                VALUE  '3'.
+      *
+      *
+      *=========================================================*
+      *
+      *=========================================================*
+        01 XXX-VARI.
+           03 XXX-IND-PER-OK                   PIC X(01).
+           03 XXX-CLI-IND-CARDET               PIC X(01).
+      * >>>
+           03 XXX-IND-FEC-FPE2                 PIC X(01).
+           03 XXX-IND-FEC-FPE3                 PIC X(01).
+           03 XXX-IND-FEC-FPE4                 PIC X(01).
+           03 XXX-IND-FEC-FPE5                 PIC X(01).
+           03 XXX-IND-FEC-FPE6                 PIC X(01).
+      * >>>
+           03 XXX-DEU-FEC-FPE1                 PIC X(06).
+           03 XXX-DEU-FEC-FPE2                 PIC X(06).
+           03 XXX-DEU-FEC-FPE3                 PIC X(06).
+           03 XXX-DEU-FEC-FPE4                 PIC X(06).
+           03 XXX-DEU-FEC-FPE5                 PIC X(06).
+           03 XXX-DEU-FEC-FPE6                 PIC X(06).
+      * >>
+      * >>>
+           03 XXX-FEC-FPER.
+              05 XXX-NUM-SPER                 PIC X(02).
+              05 XXX-NUM-APER                 PIC X(02).
+              05 XXX-NUM-MPER                 PIC X(02).
+      *
+      *
+      *
+       01  TABLA-VAR.
+           03   I-TOP              PIC 9(04) VALUE 0.
+           03   I-RRR              PIC 9(04) VALUE 0.
+           03   I-IND              PIC 9(04) VALUE 0.
+           03   I-DEU              PIC 9(04) VALUE 0.
+           03  I-CLI                PIC 9(04) VALUE 0.
+           03  WI-F                PIC 9(04) VALUE 0.
+           03  WI-E                PIC 9(04) VALUE 0.
+           03   I-MES              PIC 9(03) VALUE 0.
+           03   I-CAL              PIC 9(03) VALUE 0.
+           03  WI-PS1              PIC 9(05) VALUE 0.
+           03  WI-ESP              PIC 9(05) VALUE 0.
+      *
+           03  TABLA-CALIND.
+               05  TABLA-COD-CALIND   OCCURS 200 TIMES.
+                   10  TCAL-COD-SBIF   PIC X(02).
+      *
+           03  TABLA-PRVMES.
+               05  TABLA-CTAS-PRVMES   OCCURS 12  TIMES.
+                   10  TMES-NUM        PIC X(02).
+                   10  TMES-DES        PIC X(10).
+      *
+      *
+           03  TABLA-CLFSEG.
+               05  TABLA-VEC-CLFSEG    OCCURS 90 TIMES.
+                   10  VEC-CLF-NUM-RUTD   PIC X(09).
+                   10  VEC-CLF-FEC-FPER   PIC X(06).
+                   10  VEC-CLF-COD-SEG    PIC X(01).
+                   10  VEC-CLF-CLF-CMAX   PIC 9(17).
+      *
+      *
+        01 WSS-NUM.
+           03 WSS-TOT-SI-BCI               PIC 9(09).
+           03 WSS-TOT-SI-FOR               PIC 9(09).
+           03 WSS-TOT-NO-BCI               PIC 9(09).
+           03 WSS-TOT-CLI                  PIC 9(09).
+           03 WSS-TOT-DEU-OK               PIC 9(09).
+           03 WSS-TOT-DEU-ERR              PIC 9(09).
+           03 WSS-CLI-GRU                  PIC 9(09).
+
+           03 WSS-TOT-G-I                  PIC 9(09).
+           03 WSS-TOT-I-G                  PIC 9(09).
+           03 WSS-LEE-CLI                  PIC 9(09).
+           03 WSS-LEE-GRP                  PIC 9(09).
+           03 WSS-LEE-FAC                  PIC 9(09).
+           03 WSS-LEE-DEU                  PIC 9(09).
+           03 WSS-LEE-ESP                  PIC 9(09).
+           03 WSS-LEE-BIND                 PIC 9(09).
+           03 WSS-LEE-BDEU                 PIC 9(09).
+           03 WSS-LEE-SGM                  PIC 9(09).
+           03 WSS-LEE-TCTG                 PIC 9(09).
+           03 WSS-GRB-CLI                  PIC 9(09).
+           03 GRB-TOT-MFAC                 PIC 9(09).
+           03 WSS-GRB-SEGFAC               PIC 9(09).
+           03 GRB-TOT-SALINF               PIC 9(09).
+           03 GRB-TOT-SEGNEW               PIC 9(09).
+           03 WSS-GRB-DIF                  PIC 9(09).
+           03 WSS-GRB-FAC                  PIC 9(09).
+           03 WSS-OPE-IND                  PIC 9(09).
+           03 WSS-OPE-GRU                  PIC 9(09).
+           03 WSS-GRB-POP                  PIC 9(09).
+           03 WSS-GRB-HIS                  PIC 9(09).
+           03 WSS-GRB-INF  VALUE 0         PIC 9(09).
+           03 WSS-CLI-IND  VALUE 0         PIC 9(09).
+           03 WSS-CLI-GRP  VALUE 0         PIC 9(09).
+           03 WSS-CLI-NEW  VALUE 0         PIC 9(09).
+      *
+        01 CLI-VARI.
+           03 CCC-TOT-D00-MES6       VALUE ZEROES       PIC 9(17).
+      *
+           03 CLI-TOT-WOL1      VALUE 0    PIC 9(17).
+           03 CLI-TOT-WOL2      VALUE 0    PIC 9(17).
+           03 CLI-TOT-WOL3      VALUE 0    PIC 9(17).
+           03 CLI-TOT-WOL4      VALUE 0    PIC 9(17).
+           03 CLI-TOT-WOL5      VALUE 0    PIC 9(17).
+           03 CLI-TOT-WOL6      VALUE 0    PIC 9(17).
+      *
+           03 CLI-TOT-D001      VALUE 0    PIC 9(17).
+           03 CLI-TOT-D002      VALUE 0    PIC 9(17).
+           03 CLI-TOT-D003      VALUE 0    PIC 9(17).
+           03 CLI-TOT-D004      VALUE 0    PIC 9(17).
+           03 CLI-TOT-D005      VALUE 0    PIC 9(17).
+           03 CLI-TOT-D006      VALUE 0    PIC 9(17).
+      *
+           03 CLI-TOT-CTG1      VALUE 0    PIC 9(17).
+           03 CLI-TOT-CTG2      VALUE 0    PIC 9(17).
+           03 CLI-TOT-CTG3      VALUE 0    PIC 9(17).
+           03 CLI-TOT-CTG4      VALUE 0    PIC 9(17).
+           03 CLI-TOT-CTG5      VALUE 0    PIC 9(17).
+           03 CLI-TOT-CTG6      VALUE 0    PIC 9(17).
+      *
+           03 CLI-TOT-FAC1      VALUE 0    PIC 9(17).
+           03 CLI-TOT-FAC2      VALUE 0    PIC 9(17).
+           03 CLI-TOT-FAC3      VALUE 0    PIC 9(17).
+           03 CLI-TOT-FAC4      VALUE 0    PIC 9(17).
+           03 CLI-TOT-FAC5      VALUE 0    PIC 9(17).
+           03 CLI-TOT-FAC6      VALUE 0    PIC 9(17).
+      *
+           03 MES-TOT-D00       VALUE 0    PIC 9(17).
+           03 MES-COM-D00       VALUE 0    PIC 9(17).
+           03 MES-COM-CTG       VALUE 0    PIC 9(17).
+           03 MES-COM-WOL       VALUE 0    PIC 9(17).
+      *
+           03 MES-TOT-D001      VALUE 0    PIC 9(17).
+           03 MES-TOT-D002      VALUE 0    PIC 9(17).
+           03 MES-TOT-D003      VALUE 0    PIC 9(17).
+           03 MES-TOT-D004      VALUE 0    PIC 9(17).
+           03 MES-TOT-D005      VALUE 0    PIC 9(17).
+           03 MES-TOT-D006      VALUE 0    PIC 9(17).
+      * ====================================================*
+        01 RRR-VARI.
+           03 PAR-GLS-SEGM                 PIC X(30).
+           03 PAR-CLI-ESP                  PIC X(01).
+           03 PAR-COD-SEGM-FZA             PIC X(01).
+           03 PAR-COD-SEGM                 PIC X(01).
+           03 PAR-COD-SEGM-PAS             PIC X(01).
+           03 CCC-MES-PDO    VALUE ZEROES  PIC 9(02).
+           03 RRR-MES-CLF    VALUE ZEROES  PIC 9(02).
+           03 RRR-DEUDA      VALUE ZEROES  PIC 9(17).
+           03 RRR-MES                      PIC 9(03).
+           03 WSS-ERR-ESP                  PIC 9(03).
+           03 PAR-CLI-TCLF-IND             PIC X(01).
+           03 RRR-MES-FPE0                 PIC 9(03).
+           03 RRR-FEC-FPE0.
+              05 RRR-NUM-SPE0              PIC 9(04).
+              05 RRR-NUM-MPE0              PIC 9(02).
+
+        01 ZZZ-VARI.
+           03 WCLF-CLF-VAL-CMAX                 PIC 9(17).
+           03 PXX-COD-TBAN.
+              05 PXX-COD-TBAN-1                PIC X(01).
+              05 PXX-COD-TBAN-2                PIC X(02).
+
+
+
+        01 COB-CAL-MOR.
+           03 COB-NUM-DMOR             PIC 9(06).
+           03 COB-FEC-FVEN.
+              05 COB-NUM-SVEN          PIC 9(02).
+              05 COB-NUM-AVEN          PIC 9(02).
+              05 COB-NUM-MVEN          PIC 9(02).
+              05 COB-NUM-DVEN          PIC 9(02).
+
+       01  PXX-VAR.
+           03 CCC-PRO-DEU-MES6       VALUE ZEROES       PIC 9(17).
+           03 PXX-PROM-CON           VALUE ZEROES       PIC 9(17).
+      *
+           03 PXX-TOT-DEU            VALUE ZEROES       PIC 9(17).
+           03 PXX-TOT-SEGM           VALUE ZEROES       PIC 9(17).
+      *
+           03 CCC-DEU-COD-SBIF       VALUE SPACES  PIC X(02).
+           03 CCC-DEU-COD-TBAN       VALUE SPACES  PIC X(03).
+           03 PAR-COD-SEGM-MES-RES   VALUE SPACES  PIC X(03).
+           03 PAR-SEGM-OLD           VALUE SPACES  PIC X(01).
+           03 PXX-COD-RUTD                          PIC X(09).
+           03 PXX-VRF-RUTD                          PIC X(01).
+           03 PAR-RUT-CLIE-DIS                      PIC X(09).
+      *
+       01  WWW-VAR.
+           03 PAR-TBAN-IND                     PIC X(01).
+           03 PAR-TCLF-IND                     PIC X(01).
+           03 PAR-SEGM-CLI-AHORA               PIC X(01).
+           03 PAR-GRUP-IND                 PIC X(01).
+           03 PAR-NUM-RUTD                     PIC X(09).
+           03 WWW-SEGM-FINAL                   PIC X(01).
+           03 PAR-COD-SEGM-MES     VALUE SPACES    PIC X(01).
+           03 PAR-CLIE-BCI         VALUE SPACES    PIC X(01).
+      *
+      *
+       01  COB-VAR.
+           03 COB-SGV-VCAM     VALUE ZEROES    PIC S9(11)V9(04).
+           03 COB-VAL-TOPE-PES VALUE ZEROES    PIC S9(15).
+           03 COB-IND-SGC                      PIC X(01).
+           03 COB-IND-CANCELA                  PIC X(01).
+           03 COB-IND-AUX                      PIC X(01).
+           03 COB-IND-CTG                      PIC X(01).
+           03 COB-VRF-ICLI                     PIC X(01).
+           03 COB-GLS-RUTD.
+              05 COB-CER-RUTD                  PIC X(01).
+              05 COB-NUM-RUTD                  PIC X(08).
+
+      *
+       01  WSS-DIS.
+           03 COB-SGV-VCAM-E      VALUE ZEROES PIC ZZZZ.ZZZ.ZZ9,9999.
+           03 COB-VAL-TOPE-PES-E  VALUE ZEROES PIC ZZZZ.ZZZ.ZZ9,9999.
+           03 COB-VAL-DEU-TOT-E   VALUE ZEROES PIC ZZZZ.ZZZ.ZZZ.ZZ9.
+      *
+      *
+        01  WCC-VAR.
+            03 CC-50MIL        VALUE 50000000   PIC 9(08).
+            03 CC-999          VALUE 999        PIC 9(03).
+            03 CC-01           VALUE '01'       PIC X(02).
+            03 CC-VCAM-UF      VALUE '0998  '   PIC X(06).
+            03 CC-VCAM-PESO    VALUE '0999  '   PIC X(06).
+            03 CC-007          VALUE '007'      PIC X(03).
+            03 CC-000          VALUE '000'      PIC X(03).
+            03 CC-02           VALUE '02'       PIC X(02).
+            03 CC-03           VALUE '03'       PIC X(02).
+            03 CC-04           VALUE '04'       PIC X(02).
+            03 CC-05           VALUE '05'       PIC X(02).
+            03 CC-08           VALUE '08'       PIC X(02).
+            03 CC-P            VALUE 'P'        PIC X(01).
+            03 CC-N            VALUE 'N'        PIC X(01).
+            03 CC-S            VALUE 'S'        PIC X(01).
+            03 CC-E            VALUE 'E'        PIC X(01).
+            03 CC-G            VALUE 'G'        PIC X(01).
+            03 CC-D            VALUE 'D'        PIC X(01).
+            03 CC-C            VALUE 'C'        PIC X(01).
+            03 CC-I            VALUE 'I'        PIC X(01).
+            03 CC-B            VALUE 'B'        PIC X(01).
+            03 CC-NO           VALUE 'NO'       PIC X(02).
+      *
+      *
+        01  REG-TIT.
+           03 TIT-FIL-01                   PIC X(49)  VALUE
+           'fecha   |period|rut      |d|Ban|glosa   |d|cl|s|'.
+      *
+           03 TIT-FIL-02                   PIC X(55)  VALUE
+           'DEU_D00          |DEU_D00_CTG       | DEU_WOL'.
+      *
+           03 TIT-FIL-03                   PIC X(58)  VALUE
+           '|DEU_FAC           |MES|DEU_PDO          |'.
+      *
+      *
+        01  VAR-PARAME.
+           03 PAR-FEC-FPRO                 PIC X(08).
+      *
+           03 PAR-FEC-FPER.
+              05 PAR-NUM-SPER              PIC X(02).
+              05 PAR-NUM-APER              PIC X(02).
+              05 PAR-MES-ASEGMENTAR        PIC X(02).
+           03 PAR-FEC-FCAL.
+              05 PAR-NUM-SCAL              PIC 9(02).
+              05 PAR-NUM-ACAL              PIC 9(02).
+              05 PAR-NUM-MCAL              PIC 9(02).
+              05 PAR-NUM-DCAL              PIC 9(02).
+
+
+           03 MONTO-TOPE.
+              05 PAR-VAL-TOPE-UF              PIC 9(05).
+           03 NUM-MESES.
+              05 PAR-NUM-MES               PIC 9(03).
+              05 PAR-MES-CLF               PIC 9(03).
+      **************************************************************
+      *                   USER INFORMATION BLOCK                   *
+      **************************************************************
+      *
+       01  WB-UIB.
+           05  FILLER                       PIC X(32) VALUE 'SUPPGNF4'.
+      ************************************************************
+      *
+      ************************************************************
+       PROCEDURE DIVISION.
+      *------------------
+       INI-MAIN.
+      *>>>
+           ENTRY 'DBMSCBL'.
+           MOVE 'SUPPGNF4'  TO FIO-PROG.
+           PERFORM GNS-BUS-IDD.
+       SGT-MAIN.
+      *>>>
+           PERFORM ACCEP-PARAM.
+           PERFORM OPEN-FILES-INP.
+           PERFORM OPEN-FILES-OUT.
+           PERFORM OPEN-FILES-TAB.
+      *>>>
+           PERFORM CAR-MESES-SGM.
+           PERFORM CAR-VECTOR-CAL.
+      *>>>
+           PERFORM CAL-MTO-UF.
+           PERFORM BUS-MES-CDEU.
+      *>>>
+           PERFORM BUS-MES-ASEG.
+           PERFORM PROC-CLI-FAC.
+       NXT-MAIN.
+           PERFORM ESTADISTICA.
+           PERFORM CLOSE-FILES.
+       FIN-MAIN.
+           PERFORM GNS-PRO-END.
+      *
+      *
+      *
+       ACCEP-PARAM SECTION.
+       INI-ACCEP-PARAM.
+           ACCEPT MONTO-TOPE.
+           ACCEPT PAR-NUM-MES.
+           MOVE 1      TO  PAR-MES-CLF.
+           MOVE CC-N   TO  PAR-CLI-TCLF-IND.
+       FIN-ACCEP-PARAM.
+           EXIT.
+      *
+      *
+      *>>>>
+       OPEN-FILES-OUT SECTION.
+       INI-OPEN-FILES-OUT.
+           OPEN  OUTPUT MESFAC .
+           OPEN  OUTPUT SALFAC .
+           OPEN  OUTPUT SEGFAC .
+           OPEN  OUTPUT SALINF .
+           OPEN  OUTPUT SEGNEW .
+           IF  WS-STATUS-SALFAC     > 0  OR
+               WS-STATUS-MESFAC     > 0  OR
+               WS-STATUS-SALINF     > 0  OR
+               WS-STATUS-SEGNEW     > 0  OR
+               WS-STATUS-SEGFAC     > 0
+               DISPLAY ' ERROR SALFAC : ' WS-STATUS-SALFAC
+               DISPLAY ' ERROR SEGFAC : ' WS-STATUS-SEGFAC
+               DISPLAY ' ERROR MESFAC : ' WS-STATUS-MESFAC
+               DISPLAY ' ERROR MESFAC : ' WS-STATUS-SALINF
+               DISPLAY ' ERROR MESFAC : ' WS-STATUS-SEGNEW
+                PERFORM GNS-PRO-ABT
+           END-IF.
+       FIN-OPEN-FILES-OUT.
+           EXIT.
+      *
+      *
+      *
+      *>>>>
+       OPEN-FILES-TAB SECTION.
+       INI-OPEN-FILES-TAB.
+           OPEN  INPUT  CALIND
+           OPEN  INPUT  PRVMES
+           IF  WS-STATUS-CALIND    > 0 OR
+               WS-STATUS-PRVMES    > 0
+               DISPLAY ' ERROR CALIND :' WS-STATUS-CALIND
+               DISPLAY ' ERROR PRVMES :' WS-STATUS-PRVMES
+                PERFORM GNS-PRO-ABT
+           END-IF.
+       FIN-OPEN-FILES-TAB.
+           EXIT.
+      *
+      *
+      *
+      *
+       OPEN-FILES-INP SECTION.
+       INI-OPEN-FILES-INP.
+           OPEN  INPUT  D00DEU
+           OPEN  INPUT  CLISEG
+           OPEN  INPUT  ENTGRP
+           OPEN  INPUT  FACCLI
+           OPEN  INPUT  FACDEU
+           OPEN  INPUT  CLIESP
+           IF  WS-STATUS-D00DEU    > 0  OR
+               WS-STATUS-FACDEU    > 0  OR
+               WS-STATUS-CLISEG    > 0  OR
+               WS-STATUS-ENTGRP    > 0  OR
+               WS-STATUS-CLIESP    > 0  OR
+               WS-STATUS-FACCLI    > 0
+               DISPLAY ' ERROR CLISEG:' WS-STATUS-CLISEG
+               DISPLAY ' ERROR ENTGRP:' WS-STATUS-ENTGRP
+               DISPLAY ' ERROR D00DEU:' WS-STATUS-D00DEU
+               DISPLAY ' ERROR FACDEU:' WS-STATUS-FACDEU
+               DISPLAY ' ERROR FACCLI:' WS-STATUS-FACCLI
+               DISPLAY ' ERROR CLIESP:' WS-STATUS-CLIESP
+                PERFORM GNS-PRO-ABT
+           END-IF.
+       NXT-OPEN-FILES-INP.
+           PERFORM LEER-CLISEG
+           IF CLISEG-FIN
+              DISPLAY ' ************************************'
+              DISPLAY 'PROBLEMA CON ARCHIVO CLIENTES DEL MES'
+                PERFORM GNS-PRO-ABT
+              GO TO FIN-OPEN-FILES-INP
+           END-IF.
+           PERFORM LEER-FACCLI
+           IF FACCLI-FIN
+              DISPLAY ' ************************************'
+              DISPLAY 'PROBLEMA CON ARCHIVO CLIENTES DEL MES: FACCLI'
+                PERFORM GNS-PRO-ABT
+              GO TO FIN-OPEN-FILES-INP
+           END-IF.
+
+           MOVE FACCLI-OPE-FEC-FPER           TO  PAR-FEC-FPRO.
+           MOVE FACCLI-OPE-FEC-FPER           TO  PAR-FEC-FCAL.
+           MOVE FACCLI-OPE-FEC-FPER(1:6)      TO  PAR-FEC-FPER.
+           MOVE FACCLI-OPE-FEC-FPER(1:6)      TO  RRR-FEC-FPE0.
+           MOVE FACCLI-OPE-FEC-FPER(1:6)      TO  XXX-DEU-FEC-FPE1.
+       FIN-OPEN-FILES-INP.
+           EXIT.
+
+      *
+      *
+      *
+      *
+      *
+       CAL-MTO-UF   SECTION.
+       INI-CAL-MTO-UF  .
+           MOVE CC-N  TO COB-IND-CANCELA.
+           DISPLAY 'ARCHIVO D00 (FECHA CALCULO)= ' PAR-FEC-FCAL .
+           MOVE PAR-FEC-FCAL            TO CAM-FEC-FCAM IN CAM(1).
+           MOVE PAR-FEC-FCAL            TO CAM-FEC-FCAM IN CAM(2).
+           MOVE CC-VCAM-UF              TO CAM-COD-VCAM IN CAM(1).
+           MOVE CC-VCAM-PESO            TO CAM-COD-VCAM IN CAM(2).
+           MOVE FIO-GET-KEY TO FIO-CMND.
+           PERFORM TAB-FIO-CAM.
+           IF NOT (FIO-STAT-OKS AND
+              CAM-IND-VIGE IN CAM = 'S')
+               DISPLAY '*****************************************'
+               DISPLAY 'ERROR : PROCESO CANCELADO   '
+               DISPLAY 'CAMVCAM NEX : '  CAM-KEY-CAMB IN CAM
+               DISPLAY '*****************************************'
+               MOVE CC-S     TO COB-IND-CANCELA
+           END-IF.
+
+           MOVE  CAM-SGV-VCAM IN CAM  TO COB-SGV-VCAM.
+           MOVE  COB-SGV-VCAM         TO COB-SGV-VCAM-E.
+      *>>>>
+           COMPUTE COB-VAL-TOPE-PES =  PAR-VAL-TOPE-UF * COB-SGV-VCAM.
+           MOVE    COB-VAL-TOPE-PES   TO COB-VAL-TOPE-PES-E.
+       FIN-CAL-MTO-UF.
+           EXIT.
+      *
+      *
+       CAR-MESES-SGM   SECTION.
+       INI-CAR-MESES-SGM.
+           MOVE SPACES TO TABLA-PRVMES.
+           MOVE 0      TO  I-MES.
+           PERFORM LEER-PRVMES
+           IF PRVMES-FIN
+               DISPLAY 'ARCHIVO VACIO PRVMES'
+               GO TO FIN-CAR-MESES-SGM
+           END-IF.
+           DISPLAY 'MESES  APLIAR SEGMENTACION'
+           DISPLAY '=============================================='.
+       LUP-CAR-MESES-SGM.
+           IF PRVMES-IND-PROC = CC-NO
+              DISPLAY 'MESES: ' PRVMES-NUM-MES  '-' PRVMES-GLS-MES
+                      ' NO SE CARGA '
+              GO TO NXT-CAR-MESES-SGM
+           END-IF.
+           ADD 1             TO  I-MES
+           IF  I-MES > 12
+               DISPLAY ' ERROR TABLA MESES    > 12  '
+                PERFORM GNS-PRO-ABT
+           END-IF.
+           MOVE PRVMES-NUM-MES  TO TMES-NUM ( I-MES).
+           MOVE PRVMES-GLS-MES  TO TMES-DES ( I-MES).
+           DISPLAY 'MESES: ' TMES-NUM ( I-MES) '-' TMES-DES( I-MES).
+       NXT-CAR-MESES-SGM.
+           PERFORM LEER-PRVMES
+           IF NOT PRVMES-FIN
+              GO TO LUP-CAR-MESES-SGM
+            END-IF.
+       FIN-CAR-MESES-SGM.
+           EXIT.
+      *
+      *
+       PROC-CLI-FAC  SECTION.
+       INI-PROC-CLI-FAC.
+           DISPLAY 'PROC-CLI-FAC    '.
+           PERFORM LEER-CLIESP.
+           PERFORM LEER-FACDEU.
+           PERFORM LEER-D00DEU.
+       LUP-PROC-CLI-FAC.
+           MOVE CC-N TO PAR-CLIE-BCI.
+           MOVE SPACES  TO PAR-SEGM-OLD.
+           MOVE CC-N TO PAR-GRUP-IND.
+           PERFORM LIM-VAR-PROMEDIO
+           PERFORM BUS-HIS-SEGM.
+           PERFORM BUS-D00-DEU.
+           IF PAR-CLIE-BCI = CC-S
+              ADD  1  TO WSS-TOT-SI-BCI
+              GO TO NXT-PROC-CLI-FAC
+           END-IF.
+           PERFORM BUS-CLI-ESP.
+           IF PAR-CLI-ESP = CC-S
+              ADD 1  TO WSS-TOT-SI-FOR
+           END-IF.
+
+           PERFORM BUS-DEU-FAC.
+           PERFORM CAL-PDO-DEU.
+           PERFORM ASG-COD-SEGM.
+           PERFORM WRITE-SALFAC.
+           PERFORM WRITE-SEGFAC.
+           PERFORM WRITE-MESFAC.
+           PERFORM WRITE-SEGNEW.
+           PERFORM WRITE-SALINF.
+       NXT-PROC-CLI-FAC.
+           PERFORM LEER-FACCLI.
+           IF NOT FACCLI-FIN
+              GO TO LUP-PROC-CLI-FAC
+           END-IF.
+       FIN-PROC-CLI-FAC.
+           EXIT.
+      *
+      *
+      *
+      *
+       BUS-D00-DEU SECTION.
+       INI-BUS-D00-DEU.
+           IF D00DEU-FIN
+              GO TO FIN-BUS-D00-DEU
+           END-IF.
+       LUP-BUS-D00-DEU   .
+           IF  D00-DEU-NUM-RUTD >  FACCLI-OPE-NUM-RUT
+               GO TO FIN-BUS-D00-DEU
+           END-IF.
+      *
+           IF  D00-DEU-NUM-RUTD = FACCLI-OPE-NUM-RUT
+               PERFORM MOV-D00-DEU
+           END-IF.
+       NXT-BUS-D00-DEU.
+           PERFORM LEER-D00DEU
+           IF NOT D00DEU-FIN
+              GO TO LUP-BUS-D00-DEU
+           END-IF.
+       FIN-BUS-D00-DEU.
+           EXIT.
+      *
+      *
+      *
+       MOV-D00-DEU  SECTION.
+       INI-MOV-D00-DEU.
+           MOVE CC-N   TO   XXX-IND-PER-OK
+           IF  D00-DEU-FEC-FPER  =  XXX-DEU-FEC-FPE1 OR
+               D00-DEU-FEC-FPER  =  XXX-DEU-FEC-FPE2 OR
+               D00-DEU-FEC-FPER  =  XXX-DEU-FEC-FPE3 OR
+               D00-DEU-FEC-FPER  =  XXX-DEU-FEC-FPE4 OR
+               D00-DEU-FEC-FPER  =  XXX-DEU-FEC-FPE5 OR
+               D00-DEU-FEC-FPER  =  XXX-DEU-FEC-FPE6
+               MOVE CC-S   TO   XXX-IND-PER-OK
+           END-IF.
+
+           IF  XXX-IND-PER-OK = CC-N
+               GO TO FIN-MOV-D00-DEU
+           END-IF.
+
+           IF D00-DEU-IND-CDET   = CC-N
+              COMPUTE MES-COM-CTG     = D00-DEU-DEU-CTG-FCC
+           ELSE
+              COMPUTE MES-COM-CTG     = D00-DEU-DEU-COM-CTG
+           END-IF.
+
+           COMPUTE MES-COM-D00 = D00-DEU-DEU-COM-ACT +
+                                 D00-DEU-DEU-COM-CAE +
+                                 D00-DEU-DEU-COM-CON +
+                                 D00-DEU-DEU-COM-OTR.
+
+           IF D00-DEU-FEC-FPER  = XXX-DEU-FEC-FPE6
+              COMPUTE CLI-TOT-WOL6 = CLI-TOT-WOL6 + D00-DEU-VAL-DEU-WOL
+              COMPUTE CLI-TOT-D006 = CLI-TOT-D006 + MES-COM-D00
+              COMPUTE CLI-TOT-CTG6 = CLI-TOT-CTG6 + MES-COM-CTG
+           END-IF.
+
+           IF D00-DEU-FEC-FPER  = XXX-DEU-FEC-FPE5
+              COMPUTE CLI-TOT-WOL5 = CLI-TOT-WOL5 + D00-DEU-VAL-DEU-WOL
+              COMPUTE CLI-TOT-D005 = CLI-TOT-D005 + MES-COM-D00
+              COMPUTE CLI-TOT-CTG5 = CLI-TOT-CTG5 + MES-COM-CTG
+           END-IF.
+
+           IF D00-DEU-FEC-FPER  = XXX-DEU-FEC-FPE4
+              COMPUTE CLI-TOT-WOL4 = CLI-TOT-WOL4 + D00-DEU-VAL-DEU-WOL
+              COMPUTE CLI-TOT-D004 = CLI-TOT-D004 + MES-COM-D00
+              COMPUTE CLI-TOT-CTG4 = CLI-TOT-CTG4 + MES-COM-CTG
+           END-IF.
+
+           IF D00-DEU-FEC-FPER  = XXX-DEU-FEC-FPE3
+              COMPUTE CLI-TOT-WOL3 = CLI-TOT-WOL3 + D00-DEU-VAL-DEU-WOL
+              COMPUTE CLI-TOT-D003 = CLI-TOT-D003 + MES-COM-D00
+              COMPUTE CLI-TOT-CTG3 = CLI-TOT-CTG3 + MES-COM-CTG
+           END-IF.
+
+
+           IF D00-DEU-FEC-FPER  = XXX-DEU-FEC-FPE2
+              COMPUTE CLI-TOT-WOL2 = CLI-TOT-WOL2 + D00-DEU-VAL-DEU-WOL
+              COMPUTE CLI-TOT-D002 = CLI-TOT-D002 + MES-COM-D00
+              COMPUTE CLI-TOT-CTG2 = CLI-TOT-CTG2 + MES-COM-CTG
+           END-IF.
+
+           IF D00-DEU-FEC-FPER  = XXX-DEU-FEC-FPE1
+              MOVE D00-DEU-IND-CDET   TO  XXX-CLI-IND-CARDET
+              MOVE CC-S               TO PAR-CLIE-BCI
+              COMPUTE CLI-TOT-WOL1 = CLI-TOT-WOL1 + D00-DEU-VAL-DEU-WOL
+              COMPUTE CLI-TOT-D001 = CLI-TOT-D001 + MES-COM-D00
+              COMPUTE CLI-TOT-CTG1 = CLI-TOT-CTG1 + MES-COM-CTG
+           END-IF.
+       FIN-MOV-D00-DEU.
+           EXIT.
+      *
+      *
+      *
+       BUS-DEU-FAC SECTION.
+       INI-BUS-DEU-FAC.
+           IF FACDEU-FIN
+              GO TO FIN-BUS-DEU-FAC
+           END-IF.
+       LUP-BUS-DEU-FAC.
+           IF  FAC-DEU-NUM-RUT >  FACCLI-OPE-NUM-RUT
+               GO TO FIN-BUS-DEU-FAC
+           END-IF.
+      *
+           IF  FAC-DEU-NUM-RUT = FACCLI-OPE-NUM-RUT
+               PERFORM MOV-FAC-DEU
+           END-IF.
+       NXT-BUS-DEU-FAC.
+           PERFORM LEER-FACDEU
+           IF NOT FACDEU-FIN
+              GO TO LUP-BUS-DEU-FAC
+           END-IF.
+       FIN-BUS-DEU-FAC.
+           EXIT.
+      *
+      *
+      *
+       MOV-FAC-DEU   SECTION.
+       INI-MOV-FAC-DEU .
+           MOVE CC-N               TO   XXX-IND-PER-OK
+           MOVE FAC-DEU-NUM-SPER   TO   XXX-NUM-SPER
+           MOVE FAC-DEU-NUM-APER   TO   XXX-NUM-APER
+           MOVE FAC-DEU-NUM-MPER   TO   XXX-NUM-MPER
+
+           IF  XXX-FEC-FPER  =  XXX-DEU-FEC-FPE1 OR
+               XXX-FEC-FPER  =  XXX-DEU-FEC-FPE2 OR
+               XXX-FEC-FPER  =  XXX-DEU-FEC-FPE3 OR
+               XXX-FEC-FPER  =  XXX-DEU-FEC-FPE4 OR
+               XXX-FEC-FPER  =  XXX-DEU-FEC-FPE5 OR
+               XXX-FEC-FPER  =  XXX-DEU-FEC-FPE6
+               MOVE CC-S   TO   XXX-IND-PER-OK
+           END-IF.
+
+           IF  XXX-IND-PER-OK = CC-N
+               GO TO FIN-MOV-FAC-DEU
+           END-IF.
+
+           IF XXX-FEC-FPER  = XXX-DEU-FEC-FPE1
+              MOVE FAC-DEU-COD-SBIF     TO CCC-DEU-COD-SBIF
+              MOVE FAC-DEU-COD-TBAN     TO CCC-DEU-COD-TBAN
+              MOVE FAC-DEU-IND-TBAN-IND TO PAR-TBAN-IND
+              COMPUTE CLI-TOT-FAC1 = CLI-TOT-FAC1 + FAC-DEU-TOT-SDO
+           END-IF.
+
+           IF XXX-FEC-FPER  = XXX-DEU-FEC-FPE2
+              COMPUTE CLI-TOT-FAC2 = CLI-TOT-FAC2 + FAC-DEU-TOT-SDO
+           END-IF.
+
+           IF XXX-FEC-FPER  = XXX-DEU-FEC-FPE3
+              COMPUTE CLI-TOT-FAC3 = CLI-TOT-FAC3 + FAC-DEU-TOT-SDO
+           END-IF.
+
+           IF XXX-FEC-FPER  = XXX-DEU-FEC-FPE4
+              COMPUTE CLI-TOT-FAC4 = CLI-TOT-FAC4 + FAC-DEU-TOT-SDO
+           END-IF.
+
+           IF XXX-FEC-FPER  = XXX-DEU-FEC-FPE5
+              COMPUTE CLI-TOT-FAC5 = CLI-TOT-FAC5 + FAC-DEU-TOT-SDO
+           END-IF.
+
+           IF XXX-FEC-FPER  = XXX-DEU-FEC-FPE6
+              COMPUTE CLI-TOT-FAC6 = CLI-TOT-FAC6 + FAC-DEU-TOT-SDO
+           END-IF.
+       FIN-MOV-FAC-DEU .
+           EXIT.
+      *
+      *
+      *
+      *
+      *
+       ESTADISTICA SECTION.
+       INI-ESTADISTICA.
+           DISPLAY ' '
+           DISPLAY '*  PROGRAMA :  SUPPGNF4 '.
+           DISPLAY '*  VERSION..:  V01 (SEP-2022    )'
+           DISPLAY '*  SISTEMA..:  PROVISIONES(SEGMENTACION) '
+           DISPLAY '*  OBJETIVO.:  ULTIMA REGLA NEGOCIO       '
+           DISPLAY '*  OBJETIVO2:  DEUDA Y MARGEN SE CALCULAN X SEP'
+           DISPLAY '*  -  SELECCION DATOS DE D00DEU   Y SEGMENTA '
+           DISPLAY '*  -  ASIGNA FORZAJE X ARCHIVO   ILIMITADOS  '
+           DISPLAY '*  -                                          '
+           DISPLAY '================================================'
+           DISPLAY ' PROCESO SEGMENTA MES ..: ' PAR-SEGM-CLI-AHORA
+           DISPLAY ' FECHA PERIODO .........: ' PAR-FEC-FPER.
+           DISPLAY ' FECHA PROCESO .........: ' PAR-FEC-FPRO.
+           DISPLAY '================================================'
+           DISPLAY ' FECHA CALCULO UF ......: '  PAR-FEC-FCAL
+                                 ' VALOR UF $'   COB-SGV-VCAM-E.
+           DISPLAY ' MONTO TOPE UF .........: '  PAR-VAL-TOPE-UF
+                           '    VALOR UF $'     COB-VAL-TOPE-PES-E.
+           DISPLAY ' '
+           DISPLAY '================================================'
+           DISPLAY ' PERIODOS PARA SUMAR DEU:  ' PAR-NUM-MES
+           DISPLAY ' 1:'  XXX-DEU-FEC-FPE1  ' 2:'   XXX-DEU-FEC-FPE2
+                   ' 3:'  XXX-DEU-FEC-FPE3  ' 4:'   XXX-DEU-FEC-FPE4
+                   ' 5:'  XXX-DEU-FEC-FPE5  ' 6:'   XXX-DEU-FEC-FPE6.
+           DISPLAY '================================================'.
+           DISPLAY ' CLIENTE FAC.................: '
+           DISPLAY '       OUTPUT FAC............: '  WSS-GRB-FAC.
+           DISPLAY '       OUTPUT MES FAC........: '  GRB-TOT-MFAC.
+           DISPLAY '  '
+           DISPLAY ' TOTAL CLIENTES .............: '  WSS-GRB-INF.
+           DISPLAY '       CLIENTES INDIVIDUAL...: '  WSS-CLI-IND.
+           DISPLAY '       CLIENTES GRUPAL  .....: '  WSS-CLI-GRP.
+           DISPLAY '  '
+           DISPLAY ' TOTAL CLIENTES NO PROC BCI..: '  WSS-TOT-SI-BCI.
+           DISPLAY ' TOTAL CLIENTES FORZADO......: '  WSS-TOT-SI-FOR.
+           DISPLAY '================================================'.
+           IF COB-IND-CANCELA = CC-S
+               DISPLAY '*****************************************'
+               DISPLAY 'ERROR : PROCESO CANCELADO   '
+                PERFORM GNS-PRO-ABT
+           END-IF.
+
+           IF WSS-TOT-DEU-ERR > (  WSS-GRB-CLI / 2)
+               DISPLAY '*****************************************'
+               DISPLAY ' VALIDAR........PROCESO  HISTORICOS '
+               DISPLAY 'TOTAL DE CLIETES NO TIENDE DEUDA COMPLETA'
+               DISPLAY   ' TOTAL CLIENTES     ==>> '  WSS-LEE-CLI
+               DISPLAY   ' TOTAL CLIENTES GRP ==>> '  WSS-LEE-GRP
+               DISPLAY   ' SI:6 PERIODOS      ==>> '  WSS-TOT-DEU-OK
+               DISPLAY   ' NO:6 PERIODOS      ==>> '  WSS-TOT-DEU-ERR
+           END-IF.
+
+       FIN-ESTADISTICA.
+           EXIT.
+      *
+      *
+      *
+       CLOSE-FILES SECTION.
+       INI-CLOSE-FILES.
+           CLOSE  PRVMES
+           CLOSE  D00DEU
+           CLOSE  FACCLI
+           CLOSE  SALFAC.
+       FIN-CLOSE-FILES.
+           EXIT.
+      *
+      *
+      *
+      *
+       COPY GNSBFMSG.
+       COPY GNSBFMSC.
+       COPY GNSBFTAB.
+       COPY GNSBBMSG.
+       COPY GNSBBMSC.
+       COPY GNSBBTAB.
+       COPY GNSBGDTC.
+       COPY GNSBGIDD.
+       COPY GNSBTABT.
+       COPY GNSBBSYS.
+      *
+       COPY TABBFCAM.
+       COPY TABBGTVC.
+      *
+       COPY GNSBGCPT.
+       COPY GNSBGPES.
+       COPY GNSBGHOY.
+       COPY GNSBGFEC.
+       COPY GNSBPFEC.
+       COPY GNSBGEND.
+       COPY GNSBGABT.
+      *
+       LEER-FACCLI  SECTION.
+       INI-LEER-FACCLI .
+           READ FACCLI     AT END
+                MOVE '3' TO WR-ENT-FACCLI
+                GO TO FIN-LEER-FACCLI
+           END-READ.
+           ADD  1  TO WSS-LEE-FAC.
+       FIN-LEER-FACCLI.
+           EXIT.
+      *
+      *
+       LEER-PRVMES  SECTION.
+       INI-LEER-PRVMES.
+           READ PRVMES     AT END
+                MOVE '3' TO WR-ENT-PRVMES
+                GO TO FIN-LEER-PRVMES
+           END-READ.
+       FIN-LEER-PRVMES.
+           EXIT.
+      *
+      *
+      *
+       LEER-CLIESP  SECTION.
+       INI-LEER-CLIESP .
+           READ CLIESP     AT END
+                MOVE '3' TO WR-ENT-CLIESP
+                GO TO FIN-LEER-CLIESP
+           END-READ.
+           ADD  1  TO WSS-LEE-ESP.
+           DISPLAY ' CLIENTE ESP:'  CLIESP-NUM-RUTD.
+       FIN-LEER-CLIESP.
+           EXIT.
+      *
+      *
+       LEER-CALIND  SECTION.
+       INI-LEER-CALIND.
+           READ CALIND     AT END
+                MOVE '3' TO WR-ENT-CALIND
+                GO TO FIN-LEER-CALIND
+           END-READ.
+       FIN-LEER-CALIND.
+           EXIT.
+      *
+      *
+      *
+       LEER-D00DEU  SECTION.
+       INI-LEER-D00DEU .
+           READ D00DEU     AT END
+                MOVE '3' TO WR-ENT-D00DEU
+                GO TO FIN-LEER-D00DEU
+           END-READ.
+           ADD  1  TO WSS-LEE-DEU .
+       FIN-LEER-D00DEU .
+           EXIT.
+      *
+      *
+      *
+       LEER-FACDEU  SECTION.
+       INI-LEER-FACDEU .
+           READ FACDEU     AT END
+                MOVE '3' TO WR-ENT-FACDEU
+                GO TO FIN-LEER-FACDEU
+           END-READ.
+       FIN-LEER-FACDEU .
+           EXIT.
+      *
+      *
+       LEER-CLISEG  SECTION.
+       INI-LEER-CLISEG .
+           READ CLISEG     AT END
+                MOVE '3' TO WR-ENT-CLISEG
+                GO TO FIN-LEER-CLISEG
+           END-READ.
+           ADD  1  TO WSS-LEE-CLI .
+       FIN-LEER-CLISEG .
+           EXIT.
+      *
+      *
+      *
+       LEER-ENTGRP  SECTION.
+       INI-LEER-ENTGRP .
+           READ ENTGRP     AT END
+                MOVE '3' TO WR-ENT-ENTGRP
+                GO TO FIN-LEER-ENTGRP
+           END-READ.
+           ADD  1  TO WSS-LEE-GRP .
+       FIN-LEER-ENTGRP .
+           EXIT.
+      *
+      *
+      *
+      *
+      *
+      *
+       CAR-VECTOR-CAL SECTION.
+       INI-CAR-VECTOR-CAL.
+           MOVE SPACES TO TABLA-CALIND.
+           MOVE 0      TO  I-CAL.
+           PERFORM LEER-CALIND
+           IF CALIND-FIN
+               DISPLAY 'ARCHIVO VACIO CALIND'
+               GO TO FIN-CAR-VECTOR-CAL
+           END-IF.
+           DISPLAY ' '.
+           DISPLAY '============================================='.
+           DISPLAY 'CODIGOS DE CALIF   I'
+           DISPLAY '============================================='.
+       LUP-CAR-VECTOR-CAL.
+           ADD 1             TO  I-CAL.
+           IF  I-CAL > 100
+               DISPLAY ' ERROR TABLA CAL  IND > 100 '
+                PERFORM GNS-PRO-ABT
+           END-IF.
+           MOVE CAL-COD-SBIF    TO TCAL-COD-SBIF ( I-CAL).
+           DISPLAY 'CALIF INC : '   TCAL-COD-SBIF ( I-CAL).
+       NXT-CAR-VECTOR-CAL.
+           PERFORM LEER-CALIND
+           IF NOT CALIND-FIN
+              GO TO LUP-CAR-VECTOR-CAL
+            END-IF.
+       FIN-CAR-VECTOR-CAL.
+           EXIT.
+      *
+      *
+      *
+      *
+      *
+      *
+      *
+      *
+       BUS-MES-ASEG   SECTION.
+       INI-BUS-MES-ASEG  .
+           MOVE 0      TO  I-TOP.
+           MOVE CC-N   TO PAR-SEGM-CLI-AHORA.
+       LUP-BUS-MES-ASEG  .
+           ADD 1 TO  I-TOP
+           IF  I-TOP  >  I-MES
+              GO TO FIN-BUS-MES-ASEG
+           END-IF.
+
+           IF  TMES-NUM ( I-TOP) NOT = PAR-MES-ASEGMENTAR
+               GO TO LUP-BUS-MES-ASEG
+           END-IF.
+           MOVE CC-S  TO PAR-SEGM-CLI-AHORA.
+       FIN-BUS-MES-ASEG  .
+           EXIT.
+      *
+      *
+      *
+      *
+       LIM-VAR-PROMEDIO SECTION.
+       INI-LIM-VAR-PROMEDIO.
+           MOVE SPACES               TO PAR-SEGM-OLD.
+           MOVE CC-G                 TO PAR-COD-SEGM-MES.
+
+           MOVE ZEROES               TO CLI-TOT-D001
+           MOVE ZEROES               TO CLI-TOT-D002
+           MOVE ZEROES               TO CLI-TOT-D003
+           MOVE ZEROES               TO CLI-TOT-D004
+           MOVE ZEROES               TO CLI-TOT-D005
+           MOVE ZEROES               TO CLI-TOT-D006.
+
+           MOVE ZEROES               TO CLI-TOT-WOL1
+           MOVE ZEROES               TO CLI-TOT-WOL2
+           MOVE ZEROES               TO CLI-TOT-WOL3
+           MOVE ZEROES               TO CLI-TOT-WOL4
+           MOVE ZEROES               TO CLI-TOT-WOL5
+           MOVE ZEROES               TO CLI-TOT-WOL6
+
+           MOVE ZEROES               TO CLI-TOT-CTG1
+           MOVE ZEROES               TO CLI-TOT-CTG2
+           MOVE ZEROES               TO CLI-TOT-CTG3
+           MOVE ZEROES               TO CLI-TOT-CTG4
+           MOVE ZEROES               TO CLI-TOT-CTG5
+           MOVE ZEROES               TO CLI-TOT-CTG6
+
+           MOVE ZEROES               TO CLI-TOT-FAC1
+           MOVE ZEROES               TO CLI-TOT-FAC2
+           MOVE ZEROES               TO CLI-TOT-FAC3
+           MOVE ZEROES               TO CLI-TOT-FAC4
+           MOVE ZEROES               TO CLI-TOT-FAC5
+           MOVE ZEROES               TO CLI-TOT-FAC6
+
+           MOVE ZEROES               TO CCC-PRO-DEU-MES6.
+           MOVE ZEROES               TO PXX-TOT-SEGM.
+           MOVE ZEROES               TO PXX-TOT-SEGM.
+           MOVE ZEROES               TO CCC-MES-PDO.
+       FIN-LIM-VAR-PROMEDIO.
+           EXIT.
+      *
+      *
+      *
+       CAL-PDO-DEU  SECTION.
+       INI-CAL-PDO-DEU.
+           COMPUTE MES-TOT-D001 = CLI-TOT-FAC1 +   CLI-TOT-WOL1 +
+                                  CLI-TOT-D001 +   CLI-TOT-CTG1.
+           IF MES-TOT-D001 > ZEROES
+              ADD  1  TO   CCC-MES-PDO
+           END-IF.
+      *>>>>>>>>>>
+      *>>>>>>>>>>
+           COMPUTE MES-TOT-D002= CLI-TOT-FAC2 +   CLI-TOT-WOL2 +
+                                 CLI-TOT-D002 +   CLI-TOT-CTG2.
+           IF MES-TOT-D002 > ZEROES
+              ADD  1  TO   CCC-MES-PDO
+           END-IF.
+      *>>>>>>>>>>
+      *>>>>>>>>>>
+           COMPUTE MES-TOT-D003= CLI-TOT-FAC3 +   CLI-TOT-WOL3 +
+                                 CLI-TOT-D003 +   CLI-TOT-CTG3.
+           IF MES-TOT-D003 > ZEROES
+              ADD  1  TO   CCC-MES-PDO
+           END-IF.
+      *>>>>>>>>>>
+      *>>>>>>>>>>
+           COMPUTE MES-TOT-D004= CLI-TOT-FAC4 +   CLI-TOT-WOL4 +
+                                 CLI-TOT-D004 +   CLI-TOT-CTG4.
+           IF MES-TOT-D004 > ZEROES
+              ADD  1  TO   CCC-MES-PDO
+           END-IF.
+      *>>>>>>>>>>
+      *>>>>>>>>>>
+           COMPUTE MES-TOT-D005= CLI-TOT-FAC5 +   CLI-TOT-WOL5 +
+                                 CLI-TOT-D005 +   CLI-TOT-CTG5.
+           IF MES-TOT-D005 > ZEROES
+              ADD  1  TO   CCC-MES-PDO
+           END-IF.
+      *>>>>>>>>>>
+      *>>>>>>>>>>
+           COMPUTE MES-TOT-D006= CLI-TOT-FAC6 +   CLI-TOT-WOL6 +
+                                 CLI-TOT-D006 +   CLI-TOT-CTG6.
+           IF MES-TOT-D006 > ZEROES
+              ADD  1  TO   CCC-MES-PDO
+           END-IF.
+      *>>>>>>>>>>
+           COMPUTE CCC-TOT-D00-MES6 =  MES-TOT-D001 + MES-TOT-D002 +
+                                       MES-TOT-D003 + MES-TOT-D004 +
+                                       MES-TOT-D005 + MES-TOT-D006.
+           IF CCC-MES-PDO > 0
+              COMPUTE CCC-PRO-DEU-MES6 = CCC-TOT-D00-MES6 / CCC-MES-PDO
+           END-IF.
+       FIN-CAL-PDO-DEU.
+           EXIT.
+      *
+      *
+      *
+      *
+      *
+      *
+       BUS-MES-CDEU    SECTION.
+       INI-BUS-MES-CDEU.
+           MOVE  1              TO  RRR-MES.
+           MOVE PAR-NUM-MES     TO  RRR-MES-FPE0
+           MOVE ZEROES             TO  XXX-DEU-FEC-FPE2.
+           MOVE ZEROES             TO  XXX-DEU-FEC-FPE3.
+           MOVE ZEROES             TO  XXX-DEU-FEC-FPE4.
+           MOVE ZEROES             TO  XXX-DEU-FEC-FPE5.
+           MOVE ZEROES             TO  XXX-DEU-FEC-FPE6.
+       LUP-BUS-MES-CDEU   .
+           ADD   1  TO RRR-MES.
+           IF RRR-MES > PAR-NUM-MES
+              DISPLAY '============================================'
+              DISPLAY ' MESES PARA CALCULO DEUDA COMERCIAL'
+              DISPLAY '============================================'
+              DISPLAY ' MES(COM-1):' XXX-DEU-FEC-FPE1
+              DISPLAY ' MES(COM-2):' XXX-DEU-FEC-FPE2
+              DISPLAY ' MES(COM-3):' XXX-DEU-FEC-FPE3
+              DISPLAY ' MES(COM-4):' XXX-DEU-FEC-FPE4
+              DISPLAY ' MES(COM-5):' XXX-DEU-FEC-FPE5
+              DISPLAY ' MES(COM-6):' XXX-DEU-FEC-FPE6
+              DISPLAY '============================================'
+              GO TO FIN-BUS-MES-CDEU
+           END-IF.
+
+           IF RRR-MES-FPE0 > 0
+              IF RRR-NUM-MPE0 < 02
+                 MOVE 12    TO RRR-NUM-MPE0
+                 ADD  -1    TO RRR-NUM-SPE0
+              ELSE
+                 ADD  -1    TO RRR-NUM-MPE0
+              END-IF
+           END-IF.
+
+           EVALUATE RRR-MES
+              WHEN  2    MOVE  RRR-FEC-FPE0  TO XXX-DEU-FEC-FPE2
+              WHEN  3    MOVE  RRR-FEC-FPE0  TO XXX-DEU-FEC-FPE3
+              WHEN  4    MOVE  RRR-FEC-FPE0  TO XXX-DEU-FEC-FPE4
+              WHEN  5    MOVE  RRR-FEC-FPE0  TO XXX-DEU-FEC-FPE5
+              WHEN  6    MOVE  RRR-FEC-FPE0  TO XXX-DEU-FEC-FPE6
+           END-EVALUATE.
+           GO TO LUP-BUS-MES-CDEU.
+       FIN-BUS-MES-CDEU.
+           EXIT.
+      *
+      *
+       ASG-COD-SEGM SECTION.
+       INI-ASG-COD-SEGM.
+
+           MOVE '8:SEGMENTO FACT'   TO  PAR-GLS-SEGM                        0000
+           IF  PAR-CLI-ESP = CC-S
+               MOVE PAR-COD-SEGM-FZA TO  PAR-COD-SEGM-MES
+               MOVE '1:FORZAGE'      TO  PAR-GLS-SEGM
+               GO TO FIN-ASG-COD-SEGM
+           END-IF.
+
+
+           IF PAR-SEGM-CLI-AHORA  = CC-N
+              IF  PAR-SEGM-OLD  NOT  = SPACES
+                  MOVE PAR-SEGM-OLD      TO PAR-COD-SEGM-MES
+                  MOVE '2:NO SEGMENTADO' TO  PAR-GLS-SEGM
+                  GO TO FIN-ASG-COD-SEGM
+              ELSE
+                  ADD   1   TO WSS-CLI-NEW
+              END-IF
+           END-IF.
+       NXT-ASG-COD-SEGM.
+           IF FACCLI-IND-TBAN-IND = CC-I
+              MOVE CC-I  TO PAR-COD-SEGM-MES
+              GO TO FIN-ASG-COD-SEGM
+           END-IF.
+      *>>>>
+           IF PAR-GRUP-IND     = CC-S
+              MOVE CC-I  TO PAR-COD-SEGM-MES
+              GO TO FIN-ASG-COD-SEGM
+           END-IF.
+      *>>>>
+      *>>>>
+           MOVE  CCC-PRO-DEU-MES6     TO  PXX-TOT-SEGM
+           IF  MES-TOT-D001 NOT <  COB-VAL-TOPE-PES
+               MOVE CC-I           TO  PAR-COD-SEGM-MES
+               MOVE MES-TOT-D001   TO  PXX-TOT-SEGM
+              GO TO FIN-ASG-COD-SEGM
+           END-IF.
+
+
+           IF CCC-PRO-DEU-MES6   NOT <  COB-VAL-TOPE-PES
+              MOVE CC-I    TO PAR-COD-SEGM-MES
+           END-IF.
+       FIN-ASG-COD-SEGM.
+           EXIT.
+      *
+      *
+       WRITE-SEGFAC SECTION.
+       INI-WRITE-SEGFAC.
+           COMPUTE SFAC-DEU-TOT-FAC = CLI-TOT-FAC1 + CLI-TOT-FAC2 +
+                                      CLI-TOT-FAC3 + CLI-TOT-FAC4 +
+                                      CLI-TOT-FAC5 + CLI-TOT-FAC6.
+
+           MOVE ALL '|'                TO REG-SEGFAC.
+           MOVE FACCLI-OPE-NUM-RUT     TO SEGFAC-NUM-RUTD
+           MOVE ZEROES                 TO SEGFAC-CIC-ICLI                  00000
+           MOVE FACCLI-COD-TBAN        TO SEGFAC-COD-TBAN
+           MOVE ZEROES                 TO SEGFAC-NUM-MESES                 00000
+           MOVE ZEROES                 TO SEGFAC-VAL-CMAX                  00000
+           MOVE  SFAC-DEU-TOT-FAC      TO SEGFAC-VAL-TDEU                  00000
+           MOVE  PAR-COD-SEGM-MES      TO SEGFAC-COD-SEGM                  00000
+           PERFORM WRITE-MESFAC.
+
+           WRITE REG-SEGFAC.
+           IF   WS-STATUS-SEGFAC  > 0
+                DISPLAY 'ERROR : GRABAR SEGFAC' WS-STATUS-SEGFAC
+                PERFORM GNS-PRO-ABT
+           ELSE
+               ADD  1   TO WSS-GRB-SEGFAC
+           END-IF.
+       FIN-WRITE-SEGFAC.
+           EXIT.
+      *
+      *
+      *                                                                 00002400
+       WRITE-MESFAC    SECTION.                                            000
+       INI-WRITE-MESFAC .                                                  000
+           PERFORM MOV-FIL-SAL.
+           MOVE PAR-FEC-FPRO        TO  MFAC-DEU-FEC-FPRO
+           MOVE PAR-FEC-FPER        TO  MFAC-DEU-FEC-FPER
+           MOVE ZEROES              TO  MFAC-DEU-COM-ACT
+           MOVE ZEROES              TO  MFAC-DEU-COM-CTG
+           MOVE ZEROES              TO  MFAC-DEU-CTG-FCC
+           MOVE ZEROES              TO  MFAC-DEU-COM-CAE
+           MOVE ZEROES              TO  MFAC-DEU-COM-CON.
+           MOVE ZEROES              TO  MFAC-DEU-COM-OTR.
+           MOVE SPACES              TO  MFAC-DEU-COD-CALI
+           MOVE SEGFAC-NUM-RUTD     TO  MFAC-DEU-NUM-RUTD
+           MOVE SPACES              TO  MFAC-DEU-VRF-RUTD
+           MOVE SEGFAC-COD-SEGM     TO  MFAC-DEU-COD-CLAS
+           MOVE SEGFAC-COD-TBAN     TO  MFAC-DEU-COD-TBAN
+           MOVE ZEROES              TO  MFAC-DEU-WOL.
+           MOVE SEGFAC-VAL-TDEU     TO  MFAC-DEU-FAC .
+       NXT-WRITE-MESFAC .                                                  000
+           WRITE REG-MFAC.                                                   000
+           IF   WS-STATUS-MESFAC  > 0                                    0000422
+                DISPLAY 'ERROR : GRABAR MESFAC:  ' WS-STATUS-MESFAC     00004230
+                PERFORM GNS-PRO-ABT                                     00004250
+           ELSE                                                         00004260
+               ADD  1   TO GRB-TOT-MFAC                                  0000427
+           END-IF.                                                      00004280
+       FIN-WRITE-MESFAC .                                                  000
+           EXIT.                                                        00005970
+      *                                                                 00005760
+       MOV-FIL-SAL SECTION.                                                000
+       INI-MOV-FIL-SAL.                                                    000
+           MOVE '|'    TO  MFAC-DEU-GLS-01
+           MOVE '|'    TO  MFAC-DEU-GLS-02
+           MOVE '|'    TO  MFAC-DEU-GLS-03
+           MOVE '|'    TO  MFAC-DEU-GLS-04
+           MOVE '|'    TO  MFAC-DEU-GLS-05
+           MOVE '|'    TO  MFAC-DEU-GLS-06
+           MOVE '|'    TO  MFAC-DEU-GLS-07
+           MOVE '|'    TO  MFAC-DEU-GLS-08
+           MOVE '|'    TO  MFAC-DEU-GLS-09
+           MOVE '|'    TO  MFAC-DEU-GLS-10
+           MOVE '|'    TO  MFAC-DEU-GLS-11
+           MOVE '|'    TO  MFAC-DEU-GLS-12
+           MOVE '|'    TO  MFAC-DEU-GLS-13
+           MOVE '|'    TO  MFAC-DEU-GLS-14
+           MOVE '|'    TO  MFAC-DEU-GLS-15
+           MOVE '|'    TO  MFAC-DEU-GLS-16.
+       FIN-MOV-FIL-SAL.                                                    000
+           EXIT.
+      *
+      *
+       BUS-REG-ENTGRP  SECTION.
+       INI-BUS-REG-ENTGRP.
+           MOVE CC-N       TO PAR-GRUP-IND.
+           IF ENTGRP-FIN
+              GO TO FIN-BUS-REG-ENTGRP
+           END-IF.
+       LUP-BUS-REG-ENTGRP.
+           IF  CLI-GRP-NUM-RUT = FACCLI-OPE-NUM-RUT
+               MOVE CC-S       TO PAR-GRUP-IND
+               GO TO FIN-BUS-REG-ENTGRP
+           END-IF.
+      *
+           IF  CLI-GRP-NUM-RUT >  FACCLI-OPE-NUM-RUT
+               GO TO FIN-BUS-REG-ENTGRP
+           END-IF.
+       NXT-BUS-REG-ENTGRP.
+           PERFORM LEER-ENTGRP
+           IF NOT ENTGRP-FIN
+              GO TO LUP-BUS-REG-ENTGRP
+           END-IF.
+       FIN-BUS-REG-ENTGRP.
+           EXIT.
+      *
+      *
+      *
+       BUS-HIS-SEGM  SECTION.
+       INI-BUS-HIS-SEGM.
+           MOVE SPACES  TO PAR-SEGM-OLD
+           IF CLISEG-FIN
+              GO TO FIN-BUS-HIS-SEGM
+           END-IF.
+       LUP-BUS-HIS-SEGM.
+           IF  CLISEG-NUM-RUTD  >  FACCLI-OPE-NUM-RUT
+               GO TO FIN-BUS-HIS-SEGM
+           END-IF.
+      *
+           IF CLISEG-NUM-RUTD  = FACCLI-OPE-NUM-RUT
+              MOVE CLISEG-COD-SEGM   TO PAR-SEGM-OLD
+              GO TO FIN-BUS-HIS-SEGM
+           END-IF.
+       NXT-BUS-HIS-SEGM.
+           PERFORM LEER-CLISEG
+           IF NOT CLISEG-FIN
+              GO TO LUP-BUS-HIS-SEGM
+           END-IF.
+       FIN-BUS-HIS-SEGM.
+           EXIT.
+      *
+      *
+       WRITE-SALFAC SECTION.
+       INI-WRITE-SALFAC.
+           IF  WSS-GRB-FAC  NOT > 0
+               MOVE REG-TIT    TO REG-SAL-FAC
+               WRITE REG-SAL-FAC
+           END-IF.
+
+           MOVE ALL '|'                TO    REG-SAL-FAC.
+           MOVE  ZEROES                TO    SFAC-VRF-RUT
+           MOVE  FACCLI-OPE-FEC-FPER   TO    SFAC-FEC-FPRO
+           MOVE  FACCLI-OPE-FEC-FPER   TO    SFAC-FEC-FPER
+           MOVE  FACCLI-OPE-NUM-RUT    TO    SFAC-NUM-RUTD
+           MOVE  FACCLI-COD-TBAN       TO    SFAC-COD-TBAN
+           MOVE  FACCLI-COD-SBIF       TO    SFAC-COD-CALI
+           MOVE  PAR-COD-SEGM-MES      TO    SFAC-COD-CLAS
+           MOVE  CCC-MES-PDO           TO    SFAC-NUM-PDO
+           MOVE  CCC-PRO-DEU-MES6      TO    SFAC-DEU-PDO
+           MOVE  SPACES                TO    SFAC-IND-CDET
+           MOVE  SPACES                TO    SFAC-GLS-TBAN
+
+           IF FACCLI-IND-TBAN-IND = CC-I
+              MOVE 'BAN-IND'    TO  SFAC-GLS-TBAN
+           END-IF.
+
+           COMPUTE SFAC-DEU-TOT-D00 = CLI-TOT-D001 + CLI-TOT-D002 +
+                                      CLI-TOT-D003 + CLI-TOT-D004 +
+                                      CLI-TOT-D005 + CLI-TOT-D006.
+
+           COMPUTE SFAC-DEU-TOT-CTG = CLI-TOT-CTG1 + CLI-TOT-CTG2 +
+                                      CLI-TOT-CTG3 + CLI-TOT-CTG4 +
+                                      CLI-TOT-CTG5 + CLI-TOT-CTG6.
+
+           COMPUTE SFAC-DEU-TOT-FAC = CLI-TOT-FAC1 + CLI-TOT-FAC2 +
+                                      CLI-TOT-FAC3 + CLI-TOT-FAC4 +
+                                      CLI-TOT-FAC5 + CLI-TOT-FAC6.
+
+           COMPUTE SFAC-DEU-TOT-WOL = CLI-TOT-WOL1 + CLI-TOT-WOL2 +
+                                      CLI-TOT-WOL3 + CLI-TOT-WOL4 +
+                                      CLI-TOT-WOL5 + CLI-TOT-WOL6 .
+           WRITE REG-SAL-FAC.
+           IF   WS-STATUS-SALFAC  > 0
+                DISPLAY 'ERROR : GRABAR SALFAC' WS-STATUS-SALFAC
+                PERFORM GNS-PRO-ABT
+           ELSE
+               ADD  1   TO WSS-GRB-FAC
+           END-IF.
+       FIN-WRITE-SALFAC.
+           EXIT.
+      *
+      *
+      *
+      *
+      *                                                                 00002440
+       WRITE-SALINF SECTION.
+       INI-WRITE-SALINF.
+           MOVE ALL '|'             TO  REG-INF-CLI.
+           MOVE PAR-FEC-FPRO        TO  SAL-INF-FEC-FPRO.                   0000
+           MOVE FACCLI-OPE-NUM-RUT  TO  SAL-INF-NUM-RUTD                    0000
+           MOVE SPACES              TO  SAL-INF-CIC-ICLI                    0000
+           MOVE FACCLI-COD-TBAN     TO  SAL-INF-COD-TBAN                    0000
+           MOVE PAR-GRUP-IND        TO  SAL-INF-IND-CDEGRU              0
+           MOVE SPACES              TO  SAL-INF-COD-TBAN-IND                0000
+           MOVE PAR-SEGM-OLD        TO  SAL-INF-COD-SEGM-OLD
+           MOVE PAR-COD-SEGM-MES    TO  SAL-INF-COD-SEGM-NEW
+           MOVE PAR-GRUP-IND        TO  SAL-INF-GRUP-IND.                   0000
+           MOVE FACCLI-COD-SBIF     TO  SAL-INF-COD-CALIF.
+
+           COMPUTE SAL-INF-VAL-TDEU-D00= CLI-TOT-D001 + CLI-TOT-D002 +
+                                         CLI-TOT-D003 + CLI-TOT-D004 +
+                                         CLI-TOT-D005 + CLI-TOT-D006 +
+                                         CLI-TOT-CTG1 + CLI-TOT-CTG2 +
+                                         CLI-TOT-CTG3 + CLI-TOT-CTG4 +
+                                         CLI-TOT-CTG5 + CLI-TOT-CTG6.
+
+
+           COMPUTE SAL-INF-VAL-TDEU-FAC = CLI-TOT-FAC1 + CLI-TOT-FAC2 +
+                                      CLI-TOT-FAC3 + CLI-TOT-FAC4 +
+                                      CLI-TOT-FAC5 + CLI-TOT-FAC6.
+
+           COMPUTE SAL-INF-VAL-TDEU-WOL = CLI-TOT-WOL1 + CLI-TOT-WOL2 +
+                                      CLI-TOT-WOL3 + CLI-TOT-WOL4 +
+                                      CLI-TOT-WOL5 + CLI-TOT-WOL6 .
+      *                                                                 00000040
+           MOVE CCC-MES-PDO         TO  INF-CCC-MES-PDO.
+           MOVE CCC-TOT-D00-MES6    TO  SAL-INF-VAL-TDEU-MES
+           MOVE CCC-PRO-DEU-MES6    TO  SAL-INF-PRO-DEU-MES6
+           MOVE PAR-GLS-SEGM        TO  SAL-INF-GLS-SEGMENTA                0000
+      *                                                                 00000040
+           IF SAL-INF-COD-SEGM-OLD   = CC-I
+              ADD  1  TO  WSS-CLI-IND
+           END-IF.
+                                                                            0000
+           IF SAL-INF-COD-SEGM-OLD   = CC-G
+              ADD  1  TO  WSS-CLI-GRU
+           END-IF.
+       NXT-WRITE-SALINF.
+           WRITE REG-INF-CLI
+           IF   WS-STATUS-SALINF  > 0
+                DISPLAY 'ERROR : GRABAR SALINF: ' WS-STATUS-SALINF
+                DISPLAY 'ERROR : GRABAR SALINF: ' GRB-TOT-SALINF
+                PERFORM GNS-PRO-ABT
+           ELSE
+               ADD  1   TO GRB-TOT-SALINF
+           END-IF.
+       FIN-WRITE-SALINF.
+           EXIT.
+      *
+      *
+       WRITE-SEGNEW SECTION.
+       INI-WRITE-SEGNEW.
+           MOVE ALL '|'            TO  REG-SEGNEW.
+           IF  PAR-CLI-ESP = CC-S
+               MOVE 'F'  TO  SEGNEW-FIL-006
+           END-IF.
+
+           MOVE PAR-FEC-FPRO       TO SEGNEW-FEC-FPRO
+           MOVE PAR-FEC-FPRO       TO SEGNEW-FEC-FPER
+           MOVE FACCLI-OPE-NUM-RUT TO SEGNEW-NUM-RUTD
+           MOVE SPACES             TO SEGNEW-VRF-RUTD
+           MOVE SPACES             TO SEGNEW-CIC-ICLI
+           MOVE PAR-COD-SEGM-MES   TO SEGNEW-COD-SEGM
+           WRITE  REG-SEGNEW.                                            00
+           IF   WS-STATUS-SEGNEW  > 0
+                DISPLAY 'ERROR : GRABAR SEGNEW' WS-STATUS-SEGNEW
+                PERFORM GNS-PRO-ABT
+           ELSE
+               ADD  1   TO GRB-TOT-SEGNEW
+           END-IF.
+       FIN-WRITE-SEGNEW.
+           EXIT.
+      *                                                                 00000750
+      *
+       BUS-CLI-ESP  SECTION.
+       INI-BUS-CLI-ESP.
+           MOVE CC-N       TO PAR-CLI-ESP.
+           MOVE  SPACES    TO PAR-COD-SEGM-FZA
+           IF CLIESP-FIN
+              GO TO FIN-BUS-CLI-ESP
+           END-IF.
+       LUP-BUS-CLI-ESP.
+      *>>>
+           IF  CLIESP-NUM-RUTD >  FACCLI-OPE-NUM-RUT
+               GO TO FIN-BUS-CLI-ESP
+           END-IF.
+      *>>>
+           IF   CLIESP-NUM-RUTD = FACCLI-OPE-NUM-RUT
+                IF CLIESP-FEC-FPER  NOT =  FACCLI-OPE-FEC-FPER1
+                    DISPLAY ' FEC-FPER ERROR<>:'  FACCLI-OPE-FEC-FPER1
+                            ' FEC-FPER:'  CLIESP-FEC-FPER
+                            ' RUT :'  CLIESP-NUM-RUTD
+                    ADD 1  TO WSS-ERR-ESP
+                    GO TO  NXT-BUS-CLI-ESP
+                END-IF
+      *>>>
+                IF CLIESP-COD-SEGM  = SPACES
+                    DISPLAY ' CLIENTE NO SEGMENTO FILE'
+                            ' RUT :'  CLIESP-NUM-RUTD
+                    ADD 1  TO WSS-ERR-ESP
+                    GO TO  NXT-BUS-CLI-ESP
+                END-IF
+      *>>>
+                DISPLAY ' CLIENTE OK :'  FACCLI-OPE-NUM-RUT
+                MOVE CLIESP-COD-SEGM   TO PAR-COD-SEGM-FZA
+                MOVE CC-S              TO PAR-CLI-ESP
+                GO TO  FIN-BUS-CLI-ESP
+           END-IF.
+       NXT-BUS-CLI-ESP.
+           PERFORM LEER-CLIESP
+           IF NOT CLIESP-FIN
+              GO TO LUP-BUS-CLI-ESP
+           END-IF.
+       FIN-BUS-CLI-ESP.
+           EXIT.
+      *
+      *

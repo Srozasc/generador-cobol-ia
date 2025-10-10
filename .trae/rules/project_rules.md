@@ -304,4 +304,5 @@ MAIN-PROCESS.
 - **Seguridad:** No exponer API keys en código, usar variables de entorno
 - **Consistencia:** Seguir estas convenciones en todo el proyecto
 - **Versionado:** SIEMPRE seguir la estrategia definida en `Documentacion/inicial/estrategia_versionado.md`
+- **Registro de Cambios:** OBLIGATORIO documentar en `Documentacion/inicial/registro_cambios_mejoras.md` todos los cambios y mejoras implementadas que no estaban contempladas en el plan de acción original, una vez que estén desarrollados, testeados y funcionando correctamente
 - **Revisión:** Revisar y actualizar convenciones según evolución del proyecto
