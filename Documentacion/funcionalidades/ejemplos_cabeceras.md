@@ -23,7 +23,7 @@ Este documento presenta ejemplos prácticos de cómo la funcionalidad de **Cabec
       * SISTEMA:    BANCARIO                                           *
       * SUBSISTEMA: GESTION DE CUENTAS                                 *
       * OBJETIVOS:  GESTIONAR CUENTAS CORRIENTES DE CLIENTES           *
-      * MAINTENANCE:                                                   *
+      * MANTENCIONES:                                                  *
       * DD/MM/YYYY AUTOR      DESCRIPCION                              *
       * 15/01/2025 COBOL-IA   CREACION INICIAL DEL PROGRAMA            *
       ******************************************************************
@@ -44,7 +44,7 @@ Este documento presenta ejemplos prácticos de cómo la funcionalidad de **Cabec
       * SISTEMA:    BANCARIO                                           *
       * SUBSISTEMA: PROCESAMIENTO DE TRANSACCIONES                     *
       * OBJETIVOS:  PROCESAR TRANSACCIONES BANCARIAS DIARIAS           *
-      * MAINTENANCE:                                                   *
+      * MANTENCIONES:                                                  *
       * DD/MM/YYYY AUTOR      DESCRIPCION                              *
       * 15/01/2025 COBOL-IA   CREACION INICIAL DEL PROGRAMA            *
       ******************************************************************
@@ -67,7 +67,7 @@ Este documento presenta ejemplos prácticos de cómo la funcionalidad de **Cabec
       * SISTEMA:    SUMINISTROS                                        *
       * SUBSISTEMA: GESTION DE PROVEEDORES                             *
       * OBJETIVOS:  ADMINISTRAR INFORMACION DE PROVEEDORES             *
-      * MAINTENANCE:                                                   *
+      * MANTENCIONES:                                                  *
       * DD/MM/YYYY AUTOR      DESCRIPCION                              *
       * 15/01/2025 COBOL-IA   CREACION INICIAL DEL PROGRAMA            *
       ******************************************************************
@@ -88,7 +88,7 @@ Este documento presenta ejemplos prácticos de cómo la funcionalidad de **Cabec
       * SISTEMA:    INVENTARIO                                         *
       * SUBSISTEMA: CONTROL DE INVENTARIO                              *
       * OBJETIVOS:  CONTROLAR STOCK DE PRODUCTOS EN ALMACEN            *
-      * MAINTENANCE:                                                   *
+      * MANTENCIONES:                                                  *
       * DD/MM/YYYY AUTOR      DESCRIPCION                              *
       * 15/01/2025 COBOL-IA   CREACION INICIAL DEL PROGRAMA            *
       ******************************************************************
@@ -111,7 +111,7 @@ Este documento presenta ejemplos prácticos de cómo la funcionalidad de **Cabec
       * SISTEMA:    RECURSOS HUMANOS                                   *
       * SUBSISTEMA: GESTION DE EMPLEADOS                               *
       * OBJETIVOS:  GESTIONAR DATOS PERSONALES DE EMPLEADOS            *
-      * MAINTENANCE:                                                   *
+      * MANTENCIONES:                                                  *
       * DD/MM/YYYY AUTOR      DESCRIPCION                              *
       * 15/01/2025 COBOL-IA   CREACION INICIAL DEL PROGRAMA            *
       ******************************************************************
@@ -132,7 +132,7 @@ Este documento presenta ejemplos prácticos de cómo la funcionalidad de **Cabec
       * SISTEMA:    RECURSOS HUMANOS                                   *
       * SUBSISTEMA: GENERAL                                            *
       * OBJETIVOS:  CALCULAR NOMINA MENSUAL DE EMPLEADOS               *
-      * MAINTENANCE:                                                   *
+      * MANTENCIONES:                                                  *
       * DD/MM/YYYY AUTOR      DESCRIPCION                              *
       * 15/01/2025 COBOL-IA   CREACION INICIAL DEL PROGRAMA            *
       ******************************************************************
@@ -155,7 +155,7 @@ Este documento presenta ejemplos prácticos de cómo la funcionalidad de **Cabec
       * SISTEMA:    VENTAS                                             *
       * SUBSISTEMA: GESTION DE CLIENTES                                *
       * OBJETIVOS:  ADMINISTRAR INFORMACION DE CLIENTES                *
-      * MAINTENANCE:                                                   *
+      * MANTENCIONES:                                                  *
       * DD/MM/YYYY AUTOR      DESCRIPCION                              *
       * 15/01/2025 COBOL-IA   CREACION INICIAL DEL PROGRAMA            *
       ******************************************************************
@@ -178,7 +178,7 @@ Este documento presenta ejemplos prácticos de cómo la funcionalidad de **Cabec
       * SISTEMA:    CONTABILIDAD                                       *
       * SUBSISTEMA: GENERAL                                            *
       * OBJETIVOS:  GENERAR BALANCE GENERAL                            *
-      * MAINTENANCE:                                                   *
+      * MANTENCIONES:                                                  *
       * DD/MM/YYYY AUTOR      DESCRIPCION                              *
       * 15/01/2025 COBOL-IA   CREACION INICIAL DEL PROGRAMA            *
       ******************************************************************

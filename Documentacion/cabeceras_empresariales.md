@@ -31,7 +31,7 @@ Cada cabecera empresarial incluye obligatoriamente:
       *************************
        PROGRAM-ID.    PROG001.
        AUTHOR.        SISTEMA GENERADOR COBOL IA.
-       DATE-WRITTEN.  15/12/2024.
+       DATE-WRITTEN.  ENE-2025.
       *****************************************************************
       * SISTEMA   : PROCESAMIENTO BANCARIO EMPRESARIAL               *
       * SUBSISTEMA: BANCARIO                                          *
@@ -87,6 +87,15 @@ Basado en el nombre del programa o tipo de funcionalidad:
   - Prompt del sistema actualizado con instrucciones explícitas sobre cabeceras
   - Prompt humano enriquecido con información dinámica
   - Función `enrich_context()` para inyectar datos dinámicos
+
+## Requisitos de Formato y Modularidad
+
+- Etiqueta de mantenimiento: usar `MANTENCIONES` (formato en español) en todas las cabeceras. Sustituye `MAINTENANCE` donde aplique.
+- Estructura modular obligatoria:
+  - `MAIN-PROCESS SECTION.` como sección principal del flujo
+  - `ESTADISTICA SECTION.` para reporte y métricas del proceso
+  - `PERFORM ESTADISTICA` desde el flujo principal para mantener separación de responsabilidades
+- Integración con Datacom DML: cuando aplique, usar patrón `CALL 'DBNTRY'` con verificación de retorno y desvío a `ERROR-HANDLING` ante códigos no cero. Ver guía: `Documentacion/funcionalidades/datacom_dml.md`.
 
 ### 🧪 **Tests Implementados**
 
@@ -171,10 +180,12 @@ Suite completa de tests que valida:
 ## Configuración y Personalización
 
 ### ⚙️ **Variables de Entorno**
-No requiere configuración adicional. Utiliza las mismas variables del sistema principal:
-- `OPENAI_API_KEY`: Para acceso al LLM
-- `LLM_MODEL`: Modelo a utilizar (por defecto: gpt-5-nano-2025-08-07)
+Utiliza las mismas variables del sistema principal:
+- `GOOGLE_API_KEY`: Para acceso a Gemini (Google AI Studio)
+- `LLM_MODEL`: Modelo por defecto `gemini-1.5-flash`
 - `LLM_TEMPERATURE`: Temperatura del modelo (por defecto: 0.1)
+
+Además, la suite de tests emplea un stub determinista de LLM en `tests/conftest.py` para garantizar reproducibilidad.
 
 ### 🔧 **Personalización**
 Para personalizar la lógica de inferencia, modificar las funciones en `agents/coder.py`:

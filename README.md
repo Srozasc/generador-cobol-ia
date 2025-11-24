@@ -57,7 +57,8 @@ generador_cobol_ia/
 
 ### Prerrequisitos
 - Python 3.11+
-- OpenAI API Key (o Anthropic)
+- Google AI Studio API Key (Gemini)
+- (Opcional) OpenAI o Anthropic API Key
 - Git
 
 ### Instalación
@@ -81,9 +82,14 @@ copy .env.example .env
 
 ### Configuración de API Keys
 ```bash
-# .env
-OPENAI_API_KEY=tu_api_key_aqui
-# ANTHROPIC_API_KEY=opcional_anthropic_key
+# .env (ejemplo mínimo)
+GOOGLE_API_KEY="tu_api_key_de_google_ai_studio"
+LLM_MODEL="gemini-1.5-flash"   # por defecto en el proyecto
+LLM_TEMPERATURE=0.1
+
+# Opcional
+# OPENAI_API_KEY="sk-..."
+# ANTHROPIC_API_KEY="sk-ant-..."
 ```
 
 ## 💻 Uso
@@ -106,7 +112,7 @@ python run_prototype.py
       * SISTEMA:    SUMINISTROS                                        *
       * SUBSISTEMA: GESTION DE PROVEEDORES                             *
       * OBJETIVOS:  GESTIONAR INFORMACION DE PROVEEDORES               *
-      * MAINTENANCE:                                                   *
+      * MANTENCIONES:                                                 *
       * DD/MM/YYYY AUTOR      DESCRIPCION                              *
       * 15/01/2025 COBOL-IA   CREACION INICIAL DEL PROGRAMA            *
       ******************************************************************
@@ -127,6 +133,51 @@ python run_prototype.py
            DISPLAY 'SISTEMA DE GESTION DE PROVEEDORES'.
            DISPLAY 'PROGRAMA: SUPPGPR1'.
            STOP RUN.
+```
+
+### Ejemplo de Flujo Completo con Datacom y Modularidad
+```cobol
+      ******************************************************************
+      * PROGRAM-ID: SUPPGPR1                                           *
+      * AUTHOR:     GENERADOR COBOL IA                                 *
+      * DATE-WRITTEN: ENE-2025                                         *
+      * SISTEMA:    SUMINISTROS                                        *
+      * SUBSISTEMA: GESTION DE PROVEEDORES                             *
+      * OBJETIVOS:  CONSULTAR Y ACTUALIZAR INFORMACION DE PROVEEDORES  *
+      * MANTENCIONES:                                                 *
+      * DD/MM/YYYY AUTOR      DESCRIPCION                              *
+      * 15/01/2025 COBOL-IA   CREACION INICIAL DEL PROGRAMA            *
+      ******************************************************************
+
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. SUPPGPR1.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  RQST-AREA.
+           05  RQST-RET-CODE       PIC 9(4) COMP.
+       01  KEY-AREA.
+           05  KEY-PROVEEDOR-ID    PIC 9(9).
+       01  DATA-AREA.
+           05  NOMBRE-PROVEEDOR    PIC X(30).
+
+       PROCEDURE DIVISION.
+       MAIN-PROCESS SECTION.
+           MOVE 123456789 TO KEY-PROVEEDOR-ID.
+           CALL 'DBNTRY' USING RQST-AREA KEY-AREA DATA-AREA.
+           IF RQST-RET-CODE NOT = ZERO
+               DISPLAY 'ERROR DATACOM: ' RQST-RET-CODE
+               GO TO ERROR-HANDLING
+           END-IF
+           PERFORM ESTADISTICA
+           STOP RUN.
+
+       ERROR-HANDLING SECTION.
+           DISPLAY 'ERROR EN PROCESO PRINCIPAL'.
+           STOP RUN.
+
+       ESTADISTICA SECTION.
+           DISPLAY 'REGISTROS PROCESADOS: 1'.
 ```
 
 ## 🧪 Testing
@@ -151,6 +202,10 @@ python -m pytest tests/ --cov=. --cov-report=html
 - **Tests unitarios** para cada componente
 - **Tests de integración** end-to-end
 - **Tests de cabeceras empresariales** (8 tests específicos)
+- **Stubs de LLM**: `tests/conftest.py` implementa un stub determinista de Gemini
+  - Detecta el modo del planificador usando el último mensaje humano
+  - Genera código con cabecera empresarial y secciones modulares (`PERFORM`)
+  - Incluye áreas Datacom (`RQST-AREA`, `KEY-AREA`, `DATA-AREA`) y manejo de errores en `DBNTRY`
 
 ## 📚 Documentación
 
@@ -162,6 +217,7 @@ python -m pytest tests/ --cov=. --cov-report=html
 ### Funcionalidades
 - [Cabeceras Empresariales](./Documentacion/funcionalidades/cabeceras_empresariales.md)
 - [Ejemplos de Cabeceras](./Documentacion/funcionalidades/ejemplos_cabeceras.md)
+- [Datacom DML y Áreas](./Documentacion/funcionalidades/datacom_dml.md)
 
 ## 🎯 Casos de Uso
 
@@ -194,6 +250,15 @@ python -m pytest tests/ --cov=. --cov-report=html
 - **Type hints** obligatorios
 - **Docstrings** en formato Google
 - **Tests** para cada función pública
+
+### Convenciones COBOL
+- **Mayúsculas**: todo el código COBOL en MAYÚSCULAS.
+- **Indentación**: 4 espacios en datos; 8 espacios en procedimientos.
+- **Columnas**: 1–6 numeración (opcional), 7 indicador, 8–72 código.
+- **Cabecera**: etiqueta `MANTENCIONES` en español, no `MAINTENANCE`.
+- **Fechas**: `DATE-WRITTEN` en `MMM-YYYY`; entradas de `MANTENCIONES` en `DD/MM/YYYY`.
+- **Secciones**: `MAIN-PROCESS SECTION.` y `ESTADISTICA SECTION.` con `PERFORM ESTADISTICA`.
+- **Datacom**: verificar `RQST-RET-CODE` tras `CALL 'DBNTRY'`; desviar a `ERROR-HANDLING` si no es cero.
 
 ### Contribuir
 ```bash

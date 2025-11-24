@@ -21,7 +21,7 @@ La funcionalidad de **Cabeceras Empresariales** permite generar automáticamente
       * SISTEMA:    SUMINISTROS                                        *
       * SUBSISTEMA: GESTION DE PROVEEDORES                             *
       * OBJETIVOS:  GESTIONAR INFORMACION DE PROVEEDORES               *
-      * MAINTENANCE:                                                   *
+      * MANTENCIONES:                                                  *
       * DD/MM/YYYY AUTOR      DESCRIPCION                              *
       * 15/01/2025 COBOL-IA   CREACION INICIAL DEL PROGRAMA            *
       ******************************************************************
@@ -101,6 +101,7 @@ El prompt del agente codificador fue actualizado para:
 2. **Hacer obligatoria** la generación de cabeceras empresariales
 3. **Proporcionar ejemplo concreto** del formato esperado
 4. **Especificar instrucciones claras** para usar la información dinámica
+5. **Exigir modularidad**: incluir secciones específicas y **`PERFORM`** para mantener estructura empresarial
 
 #### Flujo de Procesamiento
 ```
@@ -145,7 +146,7 @@ Solicitud Usuario → enrich_context() → Información Dinámica → Prompt Enr
       * SISTEMA:    BANCARIO                                           *
       * SUBSISTEMA: GESTION DE CUENTAS                                 *
       * OBJETIVOS:  PROCESAR CUENTAS BANCARIAS                         *
-      * MAINTENANCE:                                                   *
+      * MANTENCIONES:                                                  *
       * DD/MM/YYYY AUTOR      DESCRIPCION                              *
       * 15/01/2025 COBOL-IA   CREACION INICIAL DEL PROGRAMA            *
       ******************************************************************
