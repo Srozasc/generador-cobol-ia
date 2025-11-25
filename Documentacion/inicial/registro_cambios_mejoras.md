@@ -193,6 +193,47 @@ Se refinó la infraestructura de pruebas y el código generado para alinearlo co
 
 ---
 
+## Cambio 3: Convenciones COBOL centralizadas y ejemplo de flujo en README
+### Fecha de Implementación: 25/11/2025
+### Versión: v1.1.2
+
+#### Explicación técnica detallada de lo que se logró
+Se centralizaron y documentaron las convenciones COBOL del proyecto y se añadió un ejemplo completo de flujo con Datacom en el README para reforzar la modularidad y el manejo de errores.
+
+##### Convenciones COBOL
+* **Archivos:** `README.md`, `Documentacion/inicial/especificacion_de_caracteristicas.md`
+* **Operación:** Actualizar
+* **Contenido:**
+  - Mayúsculas, indentación, columnas y formatos de fechas
+  - Uso de etiqueta `MANTENCIONES` en cabeceras
+  - Secciones obligatorias `MAIN-PROCESS SECTION.` y `ESTADISTICA SECTION.` con `PERFORM`
+  - Manejo de errores Datacom verificando `RQST-RET-CODE` tras `CALL 'DBNTRY'`
+
+##### Ejemplo de Flujo Completo (README)
+* **Archivo:** `README.md`
+* **Operación:** Actualizar
+* **Mejoras:**
+  - Inclusión de ejemplo COBOL con `CALL 'DBNTRY'`
+  - Verificación de `RQST-RET-CODE` y desvío a `ERROR-HANDLING`
+  - `ESTADISTICA SECTION.` invocada desde el flujo principal con `PERFORM`
+
+#### Resultados de Testing
+* **Tests totales:** 51
+* **Estado:** 51 pasando (100%)
+* **Cambios en código ejecutable:** No aplica (documentación y ejemplos)
+
+#### Documentación Actualizada
+* `README.md`: Sección de “Convenciones COBOL” y ejemplo de flujo Datacom
+* `Documentacion/inicial/especificacion_de_caracteristicas.md`: Sección “Convenciones COBOL”
+* `Documentacion/cabeceras_empresariales.md`: Requisitos de formato y modularidad
+
+#### Beneficios
+* Estándares claros y centralizados para el equipo
+* Mejor entendimiento del patrón Datacom y modularidad
+* Reducción de ambigüedades en futuras implementaciones
+
+---
+
 ## Plantilla para Futuros Cambios
 
 ### Cambio X: [Nombre del Cambio]
