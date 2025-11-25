@@ -1,0 +1,33 @@
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+py_version = 311
+skip_gitignore = true
+known_first_party = ["agents", "core", "validators", "tests"]
+
+[tool.flake8]
+max-line-length = 88
+extend-exclude = [".venv", ".git", "__pycache__", ".pytest_cache", ".mypy_cache", "build", "dist"]
+ignore = ["E203", "W503"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+check_untyped_defs = true
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+exclude = [
+    "\\.venv",
+    "\\.trae",
+    "\\.pytest_cache",
+    "\\.mypy_cache",
+    "build",
+    "dist",
+]
+
