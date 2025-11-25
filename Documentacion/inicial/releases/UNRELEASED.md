@@ -1,0 +1,37 @@
+# Unreleased
+
+Fecha: 2025-11-25
+
+## Resumen
+- Convenciones COBOL centralizadas en documentación técnica.
+- README ampliado con ejemplo de flujo completo Datacom (DBNTRY) y modularidad.
+- Cabecera empresarial: uso estandarizado de etiqueta `MANTENCIONES`.
+- Confirmación de dependencias relevantes (`langchain-google-genai`, `google-generativeai`, `python-dotenv`).
+- `.env.example` actualizado y documentación alineada.
+
+## Cambios principales
+### Documentación
+- `README.md`: Sección “Ejemplo de Flujo Completo con Datacom y Modularidad”; bloque “Convenciones COBOL”.
+- `Documentacion/inicial/especificacion_de_caracteristicas.md`: Sección “Convenciones COBOL” centralizada.
+- `Documentacion/funcionalidades/datacom_dml.md`: Guía de patrón `CALL 'DBNTRY'` con `RQST-RET-CODE`.
+- `Documentacion/cabeceras_empresariales.md` y derivados: Estándar `MANTENCIONES` y formato de fechas.
+- `Documentacion/inicial/registro_cambios_mejoras.md`: Añadido “Cambio 3”.
+
+### Código de ejemplo
+- `README.md`: Programa `SUPPGPR1` con `RQST-AREA`, `KEY-AREA`, `DATA-AREA`, `CALL 'DBNTRY'`, manejo de error con `RQST-RET-CODE`, secciones `MAIN-PROCESS` y `ESTADISTICA` con `PERFORM`.
+
+## Compatibilidad
+- Sin cambios de API en módulos Python.
+- No se requieren migraciones; se recomiendan revisar convenciones COBOL antes de generar nuevos programas.
+
+## Instrucciones de actualización
+- Asegurar variables en `.env` (ej. `OPENAI_API_KEY`).
+- Revisar el bloque “Convenciones COBOL” para alineación de estilo en programas generados.
+- Consultar `Documentacion/funcionalidades/datacom_dml.md` para flujos con Datacom.
+
+## Verificación y calidad
+- Tests existentes se mantienen (no se añadieron tests nuevos en esta release).
+- Se recomienda ejecutar `pytest -q` y `flake8` para garantizar estabilidad.
+
+## Créditos
+- Equipo: Generador COBOL IA.

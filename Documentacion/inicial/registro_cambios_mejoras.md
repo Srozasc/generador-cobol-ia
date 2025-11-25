@@ -195,7 +195,7 @@ Se refinó la infraestructura de pruebas y el código generado para alinearlo co
 
 ## Cambio 3: Convenciones COBOL centralizadas y ejemplo de flujo en README
 ### Fecha de Implementación: 25/11/2025
-### Versión: v1.1.2
+### Versión: Unreleased
 
 #### Explicación técnica detallada de lo que se logró
 Se centralizaron y documentaron las convenciones COBOL del proyecto y se añadió un ejemplo completo de flujo con Datacom en el README para reforzar la modularidad y el manejo de errores.
