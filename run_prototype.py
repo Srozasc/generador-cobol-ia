@@ -169,6 +169,27 @@ def display_results(result: dict):
     # Mostrar el código generado
     if result.get("code"):
         print_code_block("CÓDIGO COBOL GENERADO", result["code"])
+        
+        # Opción de guardar
+        save = input("¿Deseas guardar el código generado? (s/n): ").strip().lower()
+        if save == "s":
+            # Intentar extraer nombre del programa
+            default_name = "PROGRAMA.cbl"
+            import re
+            match = re.search(r"PROGRAM-ID[.\s]+([A-Z0-9]+)", result["code"])
+            if match:
+                default_name = f"{match.group(1)}.cbl"
+                
+            filename = input(f"Nombre del archivo [{default_name}]: ").strip()
+            if not filename:
+                filename = default_name
+                
+            try:
+                with open(filename, "w", encoding="utf-8") as f:
+                    f.write(result["code"])
+                print_status(f"Código guardado exitosamente en: {filename}", "success")
+            except Exception as e:
+                print_status(f"Error al guardar el archivo: {e}", "error")
     else:
         print_status("No se pudo generar código COBOL", "error")
 
@@ -176,30 +197,31 @@ def display_results(result: dict):
 def select_mode() -> str:
     """
     Permite al usuario seleccionar el modo de operación.
-    
+
     Returns:
-        str: '1' para generación, '2' para documentación
+        str: '1' para generación, '2' para documentación, '3' para modificación
     """
     print_step(1, "SELECCIÓN DE MODO")
     print("Selecciona el modo de operación:")
     print("  1. Generar nuevo programa COBOL")
     print("  2. Documentar programa COBOL existente")
+    print("  3. Modificar programa existente")
     print()
-    
+
     while True:
-        choice = input("👤 Selecciona una opción (1-2): ").strip()
-        if choice in ['1', '2']:
+        choice = input("👤 Selecciona una opción (1-3): ").strip()
+        if choice in ["1", "2", "3"]:
             return choice
-        print_status("Opción inválida. Elige 1 o 2.", "warning")
+        print_status("Opción inválida. Elige 1, 2 o 3.", "warning")
 
 
 def get_file_path() -> str:
     """
     Solicita la ruta del archivo COBOL a documentar.
-    
+
     Returns:
         str: Ruta del archivo COBOL
-    
+
     Raises:
         SystemExit: Si el usuario cancela
     """
@@ -207,15 +229,15 @@ def get_file_path() -> str:
     print("Ingresa la ruta del archivo .cbl (absoluta o relativa)")
     print("Ejemplo: ./ejemplo_codigo/SUPPGPR1.txt")
     print()
-    
+
     while True:
         path = input("📁 Ruta del archivo: ").strip()
         if os.path.exists(path):
             return path
-        
+
         print_status(f"Archivo no encontrado: {path}", "error")
         retry = input("¿Intentar de nuevo? (s/n): ").strip().lower()
-        if retry != 's':
+        if retry != "s":
             print_status("Operación cancelada por el usuario", "warning")
             sys.exit(0)
 
@@ -223,80 +245,83 @@ def get_file_path() -> str:
 def load_cobol_file(file_path: str) -> str:
     """
     Carga el contenido de un archivo COBOL.
-    
+
     Args:
         file_path: Ruta del archivo a cargar
-    
+
     Returns:
         str: Contenido del archivo COBOL
-    
+
     Raises:
         FileNotFoundError: Si el archivo no existe
         ValueError: Si el archivo no contiene código COBOL válido
     """
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Archivo no encontrado: {file_path}")
-    
+
     # Intentar con encoding latin-1 (común en mainframes)
     try:
-        with open(file_path, 'r', encoding='latin-1') as f:
+        with open(file_path, "r", encoding="latin-1") as f:
             content = f.read()
     except UnicodeDecodeError:
         # Fallback a UTF-8
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
-    
+
     # Validación básica: debe contener IDENTIFICATION DIVISION
-    if 'IDENTIFICATION DIVISION' not in content.upper():
+    if "IDENTIFICATION DIVISION" not in content.upper():
         raise ValueError(
             "El archivo no parece contener código COBOL válido "
             "(falta IDENTIFICATION DIVISION)"
         )
-    
+
     return content
 
 
 def display_documentation(result: dict):
     """
     Muestra la documentación generada en consola.
-    
+
     Args:
         result: Diccionario con la documentación generada
     """
     print_step(4, "DOCUMENTACIÓN GENERADA")
-    
+
     if result.get("error_message"):
         print_status("Error al generar documentación", "error")
         print(f"Error: {result['error_message']}")
         return
-    
+
     documentation = result.get("documentation", "")
-    
+
     if not documentation:
         print_status("No se generó documentación", "warning")
         return
-    
+
     print_status("Documentación generada exitosamente", "success")
     print()
     print("=" * 60)
     print(documentation)
     print("=" * 60)
     print()
-    
+
     # Ofrecer guardar
-    save = input("¿Deseas guardar la documentación en un archivo? (s/n): ").strip().lower()
-    if save == 's':
+    save = (
+        input("¿Deseas guardar la documentación en un archivo? (s/n): ").strip().lower()
+    )
+    if save == "s":
         # Extraer PROGRAM-ID del contenido si es posible
         program_id = "DOCUMENTATION"
         if "PROGRAM-ID" in result.get("code", ""):
             # Intentar extraer el ID
             import re
-            match = re.search(r'PROGRAM-ID[.\s]+([A-Z0-9]+)', result.get("code", ""))
+
+            match = re.search(r"PROGRAM-ID[.\s]+([A-Z0-9]+)", result.get("code", ""))
             if match:
                 program_id = match.group(1)
-        
+
         filename = f"{program_id}_DOC.md"
-        with open(filename, 'w', encoding='utf-8') as f:
+        with open(filename, "w", encoding="utf-8") as f:
             f.write(documentation)
         print_status(f"Documentación guardada en: {filename}", "success")
 
@@ -304,28 +329,76 @@ def display_documentation(result: dict):
 def run_documentation_process(cobol_code: str) -> Optional[dict]:
     """
     Ejecuta el proceso de generación de documentación.
-    
+
     Args:
         cobol_code: Código fuente COBOL
-    
+
     Returns:
         Dict con la documentación generada
     """
     try:
         from core.graph import run_documentation_process as graph_run_doc
-        
+
         print_step(3, "GENERANDO DOCUMENTACIÓN")
         print_status("Analizando código COBOL...", "processing")
-        
+
         result = graph_run_doc(cobol_code)
-        
+
         return result
-    
+
     except ImportError as e:
         print_status(f"Error de importación: {e}", "error")
         return None
     except Exception as e:
         print_status(f"Error durante la documentación: {e}", "error")
+        return None
+
+
+def run_modification_process(original_code: str, request: str) -> Optional[dict]:
+    """
+    Ejecuta el proceso de modificación de código COBOL.
+
+    Args:
+        original_code: Código COBOL original
+        request: Solicitud de modificación
+
+    Returns:
+        Dict con el resultado de la modificación
+    """
+    try:
+        # Importar aquí para evitar errores si las dependencias no están instaladas
+        from core.graph import get_compiled_graph
+
+        print_step(3, "PROCESO DE MODIFICACIÓN")
+        print_status("Inicializando agentes...", "processing")
+
+        # Obtener el grafo compilado
+        graph = get_compiled_graph()
+
+        # Estado inicial para modificación
+        initial_state = {
+            "request": request,
+            "code": original_code,  # Código original en 'code'
+            "plan": None,
+            "error_message": None,
+            "retry_count": 0,
+            "mode": "modification",
+            "original_code": original_code # También en original_code por claridad
+        }
+
+        print_status("Analizando impacto y generando plan...", "processing")
+
+        # Ejecutar el grafo
+        result = graph.invoke(initial_state)
+
+        return result
+
+    except ImportError as e:
+        print_status(f"Error de importación: {e}", "error")
+        print("💡 Asegúrate de que todas las dependencias estén instaladas")
+        return None
+    except Exception as e:
+        print_status(f"Error durante la modificación: {e}", "error")
         return None
 
 
@@ -341,8 +414,8 @@ def main():
         # Seleccionar modo de operación
         mode = select_mode()
         print()
-        
-        if mode == '1':
+
+        if mode == "1":
             # Flujo de generación (existente)
             user_request = get_user_request()
             print()
@@ -357,25 +430,49 @@ def main():
             else:
                 print_status("No se pudo completar la generación", "error")
                 sys.exit(1)
-        
-        else:
+
+        elif mode == "2":
             # Flujo de documentación (nuevo)
             file_path = get_file_path()
             print()
-            
+
             print_status("Cargando archivo COBOL...", "processing")
             cobol_code = load_cobol_file(file_path)
             print_status(f"Archivo cargado: {len(cobol_code)} caracteres", "success")
             print()
-            
+
             result = run_documentation_process(cobol_code)
-            
+
             if result:
                 display_documentation(result)
                 print_step(5, "PROCESO COMPLETADO")
                 print_status("¡Gracias por usar el Generador COBOL IA!", "success")
             else:
                 print_status("No se pudo completar la documentación", "error")
+                sys.exit(1)
+
+        elif mode == "3":
+            # Flujo de modificación (nuevo)
+            file_path = get_file_path()
+            print()
+            
+            print_status("Cargando archivo original...", "processing")
+            original_code = load_cobol_file(file_path)
+            print_status(f"Archivo cargado: {len(original_code)} caracteres", "success")
+            print()
+            
+            user_request = get_user_request()
+            print()
+            
+            result = run_modification_process(original_code, user_request)
+            
+            if result:
+                display_results(result)
+                print_step(5, "PROCESO COMPLETADO")
+                print_status("¡Gracias por usar el Generador COBOL IA!", "success")
+                print("💡 Verifica que los cambios cumplan con tus requerimientos.")
+            else:
+                print_status("No se pudo completar la modificación", "error")
                 sys.exit(1)
 
     except KeyboardInterrupt:

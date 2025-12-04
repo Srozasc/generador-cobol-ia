@@ -49,7 +49,7 @@ class TestSelectMode:
         # Assert
         assert result == "2"
 
-    @patch("builtins.input", side_effect=["invalid", "3", "1"])
+    @patch("builtins.input", side_effect=["invalid", "4", "1"])
     def test_select_mode_validates_input(self, mock_input):
         """
         Test que verifica que select_mode valida la entrada del usuario.
@@ -177,7 +177,9 @@ class TestLoadCobolFile:
         Test que verifica que load_cobol_file maneja encoding latin-1.
         """
         # Arrange: Crear archivo con caracteres especiales
-        cobol_content = "IDENTIFICATION DIVISION.\nPROGRAM-ID. TËST."  # Caracteres con tilde
+        cobol_content = (
+            "IDENTIFICATION DIVISION.\nPROGRAM-ID. TËST."  # Caracteres con tilde
+        )
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".cbl", delete=False, encoding="latin-1"
         ) as f:

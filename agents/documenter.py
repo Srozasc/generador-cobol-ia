@@ -46,7 +46,7 @@ def get_documenter_chain():
     llm = ChatGoogleGenerativeAI(
         model=_resolve_gemini_model(),
         temperature=float(os.getenv("LLM_TEMPERATURE", "0.1")),
-        max_output_tokens=int(os.getenv("LLM_MAX_OUTPUT_TOKENS", "8192")),
+        max_output_tokens=int(os.getenv("LLM_MAX_OUTPUT_TOKENS", "64000")),
         max_retries=int(os.getenv("LLM_RETRIES", "3")),
         google_api_key=os.getenv("GOOGLE_API_KEY"),
     )

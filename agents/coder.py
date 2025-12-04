@@ -6,86 +6,112 @@ un plan técnico estructurado en código COBOL funcional.
 """
 
 import os
-from typing import Dict, Any
 from datetime import datetime
-from dotenv import load_dotenv
+from typing import Any, Dict
 
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
+from dotenv import load_dotenv
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 # Cargar variables de entorno
 load_dotenv()
 
 
+def _resolve_gemini_model() -> str:
+    """Resuelve el modelo Gemini asegurando un valor válido.
+    Si LLM_MODEL no corresponde a 'gemini-*', usa 'gemini-2.5-flash'.
+    """
+    val = os.getenv("LLM_MODEL", "gemini-2.5-flash")
+    if not str(val).lower().startswith("gemini-"):
+        return "gemini-2.5-flash"
+    return val
+
+
 def get_coder_chain():
     """
     Crea y retorna una cadena de LangChain para generar código COBOL.
-    
+
     Esta función encapsula:
     - El prompt especializado para generación de código COBOL
-    - La configuración del modelo LLM (ChatOpenAI)
+    - La configuración del modelo LLM (ChatGoogleGenerativeAI)
     - El parser de salida (StrOutputParser)
     - La cadena secuencial que los conecta
     - Lógica dinámica para generar cabeceras empresariales
-    
+
     Returns:
         RunnableSequence: Cadena de LangChain lista para invocar
     """
-    
+
     # Configuración del modelo LLM desde variables de entorno
-    llm = ChatOpenAI(
-        model=os.getenv("LLM_MODEL", "gpt-5-nano-2025-08-07"),
+    llm = ChatGoogleGenerativeAI(
+        model=_resolve_gemini_model(),
         temperature=float(os.getenv("LLM_TEMPERATURE", "0.1")),
-        api_key=os.getenv("OPENAI_API_KEY")
+        max_output_tokens=int(os.getenv("LLM_MAX_OUTPUT_TOKENS", "64000")),
+        max_retries=int(os.getenv("LLM_RETRIES", "3")),
+        google_api_key=os.getenv("GOOGLE_API_KEY"),
     )
-    
+
     # Función para enriquecer el contexto con información dinámica
     def enrich_context(inputs: Dict[str, Any]) -> Dict[str, Any]:
         """
         Enriquece el contexto del plan con información dinámica para cabeceras.
-        
+        Detecta si es modo modificación (original_code presente) o creación.
+
         Args:
-            inputs: Diccionario con el plan original
-            
+            inputs: Diccionario con el plan original y opcionalmente original_code
+
         Returns:
             Dict con plan enriquecido e información dinámica
         """
         plan = inputs.get("plan", "")
-        
+        original_code = inputs.get("original_code", "")
+
         # Convertir plan a string si es un diccionario
         if isinstance(plan, dict):
             plan_text = str(plan)
         else:
             plan_text = str(plan)
-        
-        # Extraer nombre del programa del plan (buscar patrones comunes)
-        program_name = "PROG001"  # Default
-        
-        # Buscar patrones como "programa XXXX" o "PROGRAM-ID XXXX"
-        import re
-        program_patterns = [
-            r"programa\s+([A-Z0-9]{4,8})",
-            r"program-id\s+([A-Z0-9]{4,8})",
-            r"llamado\s+([A-Z0-9]{4,8})",
-            r"nombre\s+([A-Z0-9]{4,8})"
-        ]
-        
-        for pattern in program_patterns:
-            match = re.search(pattern, plan_text.lower())
-            if match:
-                program_name = match.group(1).upper()
-                break
-        
-        # Generar información dinámica
-        current_date = _get_current_date_formatted()
-        system_desc = _infer_system_from_request(plan_text)
-        subsystem = _infer_subsystem_from_program(program_name)
-        objectives = _extract_objectives_from_request(plan_text)
-        
-        # Enriquecer el plan con información dinámica
-        enriched_plan = f"""
+
+        # Detectar modo modificación
+        is_modification_mode = bool(original_code)
+
+        if is_modification_mode:
+            # Modo Modificación: Retornar plan y código original
+            return {
+                "plan": plan_text,
+                "original_code": original_code,
+                "mode": "modification"
+            }
+        else:
+            # Modo Creación: Lógica original
+            # Extraer nombre del programa del plan (buscar patrones comunes)
+            program_name = "PROG001"  # Default
+
+            # Buscar patrones como "programa XXXX" o "PROGRAM-ID XXXX"
+            import re
+
+            program_patterns = [
+                r"programa\s+([A-Z0-9]{4,8})",
+                r"program-id\s+([A-Z0-9]{4,8})",
+                r"llamado\s+([A-Z0-9]{4,8})",
+                r"nombre\s+([A-Z0-9]{4,8})",
+            ]
+
+            for pattern in program_patterns:
+                match = re.search(pattern, plan_text.lower())
+                if match:
+                    program_name = match.group(1).upper()
+                    break
+
+            # Generar información dinámica
+            current_date = _get_current_date_formatted()
+            system_desc = _infer_system_from_request(plan_text)
+            subsystem = _infer_subsystem_from_program(program_name)
+            objectives = _extract_objectives_from_request(plan_text)
+
+            # Enriquecer el plan con información dinámica
+            enriched_plan = f"""
 INFORMACIÓN DINÁMICA PARA CABECERA:
 - PROGRAM-ID: {program_name}
 - DATE-WRITTEN: {current_date}
@@ -96,22 +122,28 @@ INFORMACIÓN DINÁMICA PARA CABECERA:
 PLAN TÉCNICO ORIGINAL:
 {plan}
 """
-        
-        return {
-            "plan": enriched_plan,
-            "program_name": program_name,
-            "current_date": current_date,
-            "system_desc": system_desc,
-            "subsystem": subsystem,
-            "objectives": objectives
-        }
-    
+
+            return {
+                "plan": enriched_plan,
+                "program_name": program_name,
+                "current_date": current_date,
+                "system_desc": system_desc,
+                "subsystem": subsystem,
+                "objectives": objectives,
+                "mode": "creation"
+            }
+
     # Prompt especializado para generación de código COBOL IBM z/OS/390 con Datacom
     # Basado en análisis de código real del cliente bancario
-    prompt_template = ChatPromptTemplate.from_messages([
-        ("system", """Eres un programador COBOL senior especializado en IBM z/OS/390 con más de 20 años de experiencia en mainframes bancarios.
+    prompt_template = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                """Eres un programador COBOL senior especializado en IBM z/OS/390
+con más de 20 años de experiencia en mainframes bancarios.
 
-REGLA FUNDAMENTAL: TODO programa COBOL DEBE comenzar OBLIGATORIAMENTE con una cabecera empresarial completa.
+REGLA FUNDAMENTAL: TODO programa COBOL DEBE comenzar OBLIGATORIAMENTE
+con una cabecera empresarial completa.
 
 EJEMPLO DE CABECERA EMPRESARIAL OBLIGATORIA:
        IDENTIFICATION DIVISION.
@@ -133,12 +165,13 @@ INSTRUCCIONES CRÍTICAS PARA CABECERAS:
 1. SIEMPRE comenzar el código con la cabecera empresarial completa
 2. Usar la información dinámica proporcionada en el prompt humano
 3. Mantener el formato exacto con asteriscos y espaciado
-4. Incluir todas las secciones: PROGRAM-ID, AUTHOR, DATE-WRITTEN, SISTEMA, SUBSISTEMA, OBJETIVOS, MANTENCIONES
+4. Incluir todas las secciones: PROGRAM-ID, AUTHOR, DATE-WRITTEN,
+SISTEMA, SUBSISTEMA, OBJETIVOS, MANTENCIONES
 
 ESPECIALIZACIONES IBM z/OS/390 BANCARIAS:
 1. Genera código para IBM Enterprise COBOL for z/OS
 2. Usa convenciones de nomenclatura bancaria empresarial
-3. Implementa acceso a Datacom usando SQL embebido
+3. Implementa acceso a Datacom usando DML nativo (NO SQL)
 4. Incluye manejo de errores SQL estándar empresarial
 5. Usa tipos de datos compatibles con z/OS y sistemas bancarios
 6. Implementa múltiples archivos con FILE STATUS
@@ -219,24 +252,33 @@ SECCIONES MODULARES OBLIGATORIAS:
 3. Sección de manejo de errores
 4. Sección de estadísticas (opcional)
 
-ESPECIFICACIONES DATACOM SQL:
-1. Usa EXEC SQL ... END-EXEC para comandos SQL
-2. Define host-variables en secciones DECLARE:
-   EXEC SQL
-       BEGIN DECLARE SECTION
-   END-EXEC
-   01  WS-VARIABLE    PIC X(20).
-   EXEC SQL
-       END DECLARE SECTION
-   END-EXEC
-3. Incluye siempre variables de control SQL:
-   01  SQLCODE        PIC S9(9) COMP.
-   01  SQLSTATE       PIC X(5).
-4. Maneja errores SQL después de cada comando:
-   IF SQLCODE NOT = 0
-       DISPLAY 'ERROR SQL: ' SQLCODE
-       PERFORM ERROR-HANDLING
-   END-IF
+ESPECIFICACIONES DATACOM DML NATIVO:
+1. Usa DML nativo de Datacom vía llamada al servicio DBNTRY (SIN SQL)
+2. Define las áreas estándar para interacción con Datacom:
+   - RQST-AREA: área de solicitud/comando
+     (ej.: 'FIND', 'READ', 'ADD', 'MODIFY', 'DELETE')
+   - KEY-AREA: área de clave para búsquedas/lecturas
+   - DATA-AREA: área de datos del registro
+   - DB-STATUS: área/campo de estado y código de retorno
+3. Ejemplo de definición de áreas:
+   01  RQST-AREA.
+       05  RDCMND           PIC X(04) VALUE SPACES.
+       05  RDNR             PIC X(08) VALUE SPACES.
+   01  KEY-AREA.
+       05  WS-NUM-RUTD      PIC X(09).
+   01  DATA-AREA.
+       05  WS-COD-TBAN      PIC X(03).
+       05  WS-COD-SBIF      PIC X(02).
+       05  WS-FEC-FPRO      PIC X(08).
+       05  WS-IMP-SALDO     PIC S9(15)V99 COMP-3.
+   01  DB-STATUS.
+       05  DB-RETURN-CODE   PIC S9(9) COMP VALUE ZERO.
+4. Invocación estándar:
+   CALL 'DBNTRY' USING RQST-AREA, DATA-AREA, KEY-AREA, DB-STATUS.
+5. Manejo de errores DML:
+   - Verificar DB-RETURN-CODE después de cada llamada a DBNTRY
+   - Si DB-RETURN-CODE NOT = 0, realizar manejo centralizado de error
+   - Registrar códigos y mensajes descriptivos
 
 TIPOS DE DATOS z/OS BANCARIOS:
 - PIC X(n) para campos de texto y códigos
@@ -252,8 +294,8 @@ TIPOS DE DATOS z/OS BANCARIOS:
 MANEJO DE ERRORES ESTÁNDAR EMPRESARIAL:
 1. Sección ERROR-HANDLING para manejo centralizado
 2. Verificar FILE STATUS después de cada operación de archivo
-3. Verificar SQLCODE después de cada operación SQL
-4. Usar SQLSTATE para errores específicos
+3. Verificar DB-RETURN-CODE después de cada operación DML Datacom
+4. Registrar detalle del error DML (código/condición) para análisis
 5. Mostrar mensajes descriptivos con códigos de error
 6. Implementar rutinas de abort (PERFORM GNS-PRO-ABT)
 
@@ -288,7 +330,8 @@ ESTRUCTURA DE PROGRAMA ESTÁNDAR CON CABECERA EMPRESARIAL:
            [Variables de FILE STATUS]
            [Estructuras complejas con niveles jerárquicos]
            [Campos bancarios específicos]
-           [Variables SQL si es necesario]
+           [Áreas y variables Datacom DML (RQST-AREA, KEY-AREA,
+            DATA-AREA, DB-STATUS) si es necesario]
 
        PROCEDURE DIVISION.
        MAIN-PROCESS SECTION.
@@ -374,13 +417,11 @@ MAIN-PROCESS SECTION.
         DISPLAY 'ERROR OPEN CTACTG: ' WS-STATUS-CTACTG
         PERFORM ERROR-HANDLING
     END-IF
-    
     OPEN OUTPUT SUPD00
     IF WS-STATUS-SUPD00 > '00'
         DISPLAY 'ERROR OPEN SUPD00: ' WS-STATUS-SUPD00
         PERFORM ERROR-HANDLING
     END-IF
-    
     PERFORM LEE-CTA-CTG
     PERFORM ESTADISTICA
     STOP RUN.
@@ -405,11 +446,11 @@ ERROR-HANDLING SECTION.
 ESTADISTICA SECTION.
     DISPLAY 'REGISTROS PROCESADOS: ' WS-CONT-REGISTROS.
 
-EJEMPLO 2 - Consulta SQL con campos bancarios:
+EJEMPLO 2 - Consulta DML DATACOM con campos bancarios (SIN SQL):
 IDENTIFICATION DIVISION.
 PROGRAM-ID. CONSULBCO.
 *
-* CONSULTA DE DATOS BANCARIOS
+* CONSULTA DE DATOS BANCARIOS CON DML NATIVO DATACOM
 *
 ENVIRONMENT DIVISION.
 CONFIGURATION SECTION.
@@ -418,20 +459,19 @@ SPECIAL-NAMES.
 
 DATA DIVISION.
 WORKING-STORAGE SECTION.
-    EXEC SQL
-        BEGIN DECLARE SECTION
-    END-EXEC
-    01  WS-NUM-RUTD        PIC X(09).
-    01  WS-COD-TBAN        PIC X(03).
-    01  WS-COD-SBIF        PIC X(02).
-    01  WS-FEC-FPRO        PIC X(08).
-    01  WS-IMP-SALDO       PIC S9(15)V99 COMP-3.
-    EXEC SQL
-        END DECLARE SECTION
-    END-EXEC
-    01  SQLCODE            PIC S9(9) COMP.
-    01  SQLSTATE           PIC X(5).
-    01  WS-CONT-CONSULTAS  PIC S9(07) COMP-3 VALUE ZERO.
+    01  RQST-AREA.
+        05  RDCMND           PIC X(04) VALUE SPACES.
+        05  RDNR             PIC X(08) VALUE 'CLIENTE'.
+    01  KEY-AREA.
+        05  WS-NUM-RUTD      PIC X(09).
+    01  DATA-AREA.
+        05  WS-COD-TBAN      PIC X(03).
+        05  WS-COD-SBIF      PIC X(02).
+        05  WS-FEC-FPRO      PIC X(08).
+        05  WS-IMP-SALDO     PIC S9(15)V99 COMP-3.
+    01  DB-STATUS.
+        05  DB-RETURN-CODE   PIC S9(9) COMP VALUE ZERO.
+    01  WS-CONT-CONSULTAS    PIC S9(07) COMP-3 VALUE ZERO.
 
 PROCEDURE DIVISION.
 MAIN-PROCESS SECTION.
@@ -441,21 +481,15 @@ MAIN-PROCESS SECTION.
     STOP RUN.
 
 CONSULTA-CLIENTE SECTION.
-    EXEC SQL
-        SELECT COD_TBAN, COD_SBIF, FEC_FPRO, IMP_SALDO
-        INTO :WS-COD-TBAN, :WS-COD-SBIF, :WS-FEC-FPRO, :WS-IMP-SALDO
-        FROM CLIENTES_BANCARIOS
-        WHERE NUM_RUTD = :WS-NUM-RUTD
-    END-EXEC
-    
-    IF SQLCODE = 0
+    MOVE 'FIND' TO RDCMND
+    CALL 'DBNTRY' USING RQST-AREA, DATA-AREA, KEY-AREA, DB-STATUS
+    IF DB-RETURN-CODE = 0
         ADD 1 TO WS-CONT-CONSULTAS
         DISPLAY 'CLIENTE: ' WS-NUM-RUTD
         DISPLAY 'BANCO: ' WS-COD-TBAN
         DISPLAY 'SALDO: ' WS-IMP-SALDO
     ELSE
-        DISPLAY 'ERROR SQL: ' SQLCODE
-        DISPLAY 'SQLSTATE: ' SQLSTATE
+        DISPLAY 'ERROR DATACOM DML: ' DB-RETURN-CODE
         PERFORM ERROR-HANDLING
     END-IF.
 
@@ -469,9 +503,11 @@ ESTADISTICA SECTION.
 FORMATO DE SALIDA:
 - Solo código COBOL
 - Sin comentarios explicativos
-- Sin texto adicional antes o después del código"""),
-        
-        ("human", """Plan técnico a implementar:
+- Sin texto adicional antes o después del código""",
+            ),
+            (
+                "human",
+                """Plan técnico a implementar:
 {plan}
 
 INFORMACIÓN DINÁMICA PARA CABECERA EMPRESARIAL:
@@ -482,55 +518,127 @@ INFORMACIÓN DINÁMICA PARA CABECERA EMPRESARIAL:
 - OBJETIVOS: {objectives}
 
 INSTRUCCIONES ESPECÍFICAS:
-1. OBLIGATORIO: Usar la información dinámica proporcionada arriba para generar la cabecera empresarial
-2. Reemplazar los placeholders [NOMBRE-PROGRAMA], [MES-AÑO ACTUAL], etc. con los valores específicos proporcionados
+1. OBLIGATORIO: Usar la información dinámica proporcionada arriba
+   para generar la cabecera empresarial
+2. Reemplazar los placeholders [NOMBRE-PROGRAMA], [MES-AÑO ACTUAL], etc.
+   con los valores específicos proporcionados
 3. Generar código COBOL completo que implemente el plan técnico
 4. Incluir todas las divisiones obligatorias de COBOL
 5. Usar las convenciones empresariales especificadas en el prompt del sistema
 
-Genera ÚNICAMENTE código COBOL puro, sin explicaciones adicionales.""")
-    ])
-    
+Genera ÚNICAMENTE código COBOL puro, sin explicaciones adicionales.""",
+            ),
+        ]
+    )
+
+    # Prompt especializado para MODIFICACIÓN de código COBOL existente
+    modification_prompt_template = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                """Eres un Desarrollador COBOL experto en mantenimiento de sistemas mainframe.
+Tu especialidad es modificar código COBOL existente sin romper la funcionalidad actual.
+
+REGLAS CRÍTICAS PARA MODIFICACIÓN:
+1. **Preservación**: NO elimines ni modifiques lógica existente a menos que el plan lo pida explícitamente
+2. **Integración**: Inserta la nueva lógica (IF/PERFORM/CALL) en el punto exacto indicado
+3. **Completitud**: Si el plan pide llamar a una rutina que no existe, crea un párrafo stub (esqueleto)
+4. **Formato**: Respeta las márgenes COBOL (Área A/B) estrictamente
+5. **Estructura**: Mantén todas las divisiones y secciones del código original
+
+CAPACIDADES REQUERIDAS:
+- Insertar bloques IF/EVALUATE complejos con múltiples condiciones (AND/OR)
+- Agregar llamadas PERFORM o CALL a rutinas nuevas o existentes
+- Crear párrafos stub si se necesitan rutinas nuevas
+- Preservar comentarios y estructura del código original
+- Mantener el estilo de codificación del programa original
+
+FORMATO DE SALIDA:
+- Genera el CÓDIGO COBOL COMPLETO modificado
+- Sin explicaciones, solo código
+- Código compilable y funcional""",
+            ),
+            (
+                "human",
+                """CÓDIGO ORIGINAL:
+{original_code}
+
+PLAN DE CAMBIOS:
+{plan}
+
+INSTRUCCIONES:
+1. Analiza el código original cuidadosamente
+2. Identifica dónde aplicar los cambios según el plan
+3. Implementa los cambios preservando el resto del código
+4. Si se necesitan rutinas nuevas (PERFORM/CALL), créalas como stubs al final
+
+Genera ÚNICAMENTE el código COBOL completo modificado.""",
+            ),
+        ]
+    )
+
     # Parser de salida para obtener string limpio
     output_parser = StrOutputParser()
-    
-    # Crear la cadena secuencial con enriquecimiento dinámico
+
+    # Función para seleccionar el prompt apropiado basado en el modo
+    def select_prompt_and_invoke(enriched_data: Dict[str, Any]):
+        """Selecciona el prompt template apropiado según el modo e invoca el LLM."""
+        mode = enriched_data.get("mode", "creation")
+        
+        if mode == "modification":
+            # Modo modificación: usar prompt de mantenimiento
+            messages = modification_prompt_template.invoke(enriched_data)
+        else:
+            # Modo creación: usar prompt original
+            messages = prompt_template.invoke(enriched_data)
+        
+        # Invocar el LLM con los mensajes generados
+        response = llm.invoke(messages)
+        
+        # Extraer el contenido del mensaje de respuesta
+        if hasattr(response, "content"):
+            return response.content
+        else:
+            return str(response)
+
+    from langchain_core.runnables import RunnableLambda
+
+    # Crear la cadena secuencial con enriquecimiento dinámico y selección de prompt
     chain = (
-        enrich_context
-        | prompt_template
-        | llm
+        RunnableLambda(enrich_context)
+        | RunnableLambda(select_prompt_and_invoke)
         | output_parser
     )
-    
+
     return chain
 
 
 def generate_cobol_code(plan: str) -> str:
     """
     Función de conveniencia para generar código COBOL desde un plan.
-    
+
     Args:
         plan: Descripción técnica del programa a generar
-        
+
     Returns:
         str: Código COBOL generado
-        
+
     Raises:
         ValueError: Si el plan está vacío o es inválido
         Exception: Si hay errores en la generación
     """
     if not plan or not plan.strip():
         raise ValueError("El plan no puede estar vacío")
-    
+
     try:
         coder_chain = get_coder_chain()
         result = coder_chain.invoke({"plan": plan})
-        
+
         if not result or not result.strip():
             raise Exception("El LLM no generó código válido")
-            
+
         return result.strip()
-        
+
     except Exception as e:
         raise Exception(f"Error al generar código COBOL: {str(e)}")
 
@@ -539,19 +647,19 @@ def generate_cobol_code(plan: str) -> str:
 def _validate_cobol_structure(code: str) -> bool:
     """
     Valida que el código generado tenga estructura COBOL básica.
-    
+
     Args:
         code: Código COBOL a validar
-        
+
     Returns:
         bool: True si tiene estructura válida
     """
     required_elements = [
         "IDENTIFICATION DIVISION.",
         "PROGRAM-ID.",
-        "PROCEDURE DIVISION."
+        "PROCEDURE DIVISION.",
     ]
-    
+
     return all(element in code for element in required_elements)
 
 
@@ -559,7 +667,7 @@ def _validate_cobol_structure(code: str) -> bool:
 def _get_current_date_formatted() -> str:
     """
     Obtiene la fecha actual en formato DD/MM/YYYY para DATE-WRITTEN.
-    
+
     Returns:
         str: Fecha en formato DD/MM/YYYY (ej: 15/12/2024)
     """
@@ -570,20 +678,26 @@ def _get_current_date_formatted() -> str:
 def _infer_system_from_request(request: str) -> str:
     """
     Infiere la descripción del sistema basada en el contexto del request.
-    
+
     Args:
         request: Texto del request del usuario
-        
+
     Returns:
         str: Descripción del sistema inferida
     """
     request_lower = request.lower()
-    
-    if any(keyword in request_lower for keyword in ["bancario", "banco", "transacciones", "transaccion"]):
+
+    if any(
+        keyword in request_lower
+        for keyword in ["bancario", "banco", "transacciones", "transaccion"]
+    ):
         return "BANCARIO"
     elif any(keyword in request_lower for keyword in ["cliente", "clientes"]):
         return "CLIENTES"
-    elif any(keyword in request_lower for keyword in ["financiero", "finanzas", "reportes financieros"]):
+    elif any(
+        keyword in request_lower
+        for keyword in ["financiero", "finanzas", "reportes financieros"]
+    ):
         return "FINANCIERO"
     elif any(keyword in request_lower for keyword in ["cuenta", "cuentas"]):
         return "CUENTAS"
@@ -596,15 +710,15 @@ def _infer_system_from_request(request: str) -> str:
 def _infer_subsystem_from_program(program_name: str) -> str:
     """
     Infiere el subsistema basado en el nombre del programa.
-    
+
     Args:
         program_name: Nombre del programa COBOL
-        
+
     Returns:
         str: Subsistema inferido
     """
     program_upper = program_name.upper()
-    
+
     if program_upper.startswith("SUPP"):
         return "SUPP"
     elif program_upper.startswith("BANC"):
@@ -623,15 +737,15 @@ def _infer_subsystem_from_program(program_name: str) -> str:
 def _extract_objectives_from_request(request: str) -> str:
     """
     Extrae los objetivos del programa basado en el request del usuario.
-    
+
     Args:
         request: Texto del request del usuario
-        
+
     Returns:
         str: Objetivos extraídos (máximo 50 caracteres)
     """
     request_clean = request.strip().upper()
-    
+
     # Mapear patrones comunes a objetivos específicos
     if "HOLA MUNDO" in request_clean:
         return "MOSTRAR MENSAJE HOLA MUNDO"
@@ -646,22 +760,28 @@ def _extract_objectives_from_request(request: str) -> str:
     else:
         # Tomar las primeras palabras significativas
         words = request_clean.split()
-        significant_words = [w for w in words if len(w) > 3 and w not in ["CREAR", "PROGRAMA", "COBOL", "QUE"]]
+        significant_words = [
+            w
+            for w in words
+            if len(w) > 3 and w not in ["CREAR", "PROGRAMA", "COBOL", "QUE"]
+        ]
         objective = " ".join(significant_words[:6])  # Máximo 6 palabras
         return objective[:50]  # Máximo 50 caracteres
 
 
-def _generate_enterprise_header(program_name: str, current_date: str, system: str, subsystem: str, objectives: str) -> str:
+def _generate_enterprise_header(
+    program_name: str, current_date: str, system: str, subsystem: str, objectives: str
+) -> str:
     """
     Genera la cabecera empresarial completa para un programa COBOL.
-    
+
     Args:
         program_name: Nombre del programa COBOL
         current_date: Fecha actual en formato DD/MM/YYYY
         system: Descripción del sistema
         subsystem: Subsistema
         objectives: Objetivos del programa
-        
+
     Returns:
         str: Cabecera empresarial formateada
     """
@@ -679,5 +799,5 @@ def _generate_enterprise_header(program_name: str, current_date: str, system: st
       * FECHA      RESPONSABLE MOTIVO                                 *
       * {current_date:<10} COBOL-IA    GENERACION INICIAL DEL PROGRAMA       *
       *****************************************************************"""
-    
+
     return header

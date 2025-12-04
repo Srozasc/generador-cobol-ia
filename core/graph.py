@@ -19,11 +19,12 @@ from validators.mock_validator import validate_code
 
 class GraphState(TypedDict, total=False):
     """Estado del grafo de LangGraph.
-    
-    Soporta tres modos de operación:
+
+    Soporta cuatro modos de operación:
     - 'generation': Generación de código COBOL nuevo
     - 'correction': Corrección de código existente
     - 'documentation': Generación de documentación técnica
+    - 'modification': Modificación de reglas de negocio en código existente
     """
 
     request: str
@@ -32,7 +33,8 @@ class GraphState(TypedDict, total=False):
     error_message: str
     retry_count: int
     documentation: str  # Documentación generada (modo documentation)
-    mode: str  # 'generation', 'correction', 'documentation'
+    mode: str  # 'generation', 'correction', 'documentation', 'modification'
+    original_code: str  # Código original (modo modification)
 
 
 def planner_node(state: GraphState) -> dict:
@@ -48,7 +50,15 @@ def planner_node(state: GraphState) -> dict:
     planner_chain = get_planner_chain()
 
     # Preparar entrada según el modo
-    if state.get("code") and state.get("error_message"):
+    mode = state.get("mode", "generation")
+    
+    if mode == "modification":
+        # Modo modificación: pasar código original
+        input_data = {
+            "request": state["request"],
+            "original_code": state.get("code", "")  # El código original está en 'code'
+        }
+    elif state.get("code") and state.get("error_message"):
         # Modo corrección
         input_data = {
             "request": state["request"],
@@ -59,7 +69,7 @@ def planner_node(state: GraphState) -> dict:
         # Modo creación
         input_data = {"request": state["request"]}
 
-    logger.info("Ejecutando nodo planner")
+    logger.info(f"Ejecutando nodo planner (modo: {mode})")
     result = planner_chain.invoke(input_data)
     logger.debug(f"Plan generado: {result}")
     return {"plan": result}
@@ -77,7 +87,21 @@ def coder_node(state: GraphState) -> dict:
     """
     logger.info("Ejecutando nodo coder")
     coder_chain = get_coder_chain()
-    result = coder_chain.invoke({"plan": state["plan"]})
+    
+    # Preparar entrada según el modo
+    mode = state.get("mode", "generation")
+    
+    if mode == "modification":
+        # Modo modificación: pasar plan y código original
+        input_data = {
+            "plan": state["plan"],
+            "original_code": state.get("code", "")  # El código original está en 'code'
+        }
+    else:
+        # Modo creación/corrección: solo plan
+        input_data = {"plan": state["plan"]}
+    
+    result = coder_chain.invoke(input_data)
     logger.debug("Código generado (primeras 120 chars): %s", str(result)[:120])
     return {"code": result}
 
@@ -180,24 +204,24 @@ def run_cobol_generation(request: str) -> GraphState:
 def documenter_node(state: GraphState) -> dict:
     """
     Nodo del agente de documentación.
-    
+
     Args:
         state: Estado actual del grafo
-    
+
     Returns:
         Dict con la documentación generada
     """
     logger.info("Ejecutando nodo documenter")
-    
+
     cobol_code = state.get("code", "")
-    
+
     if not cobol_code or not cobol_code.strip():
         logger.warning("Código COBOL vacío en documenter_node")
         return {
             "error_message": "Código COBOL vacío",
             "documentation": "# Error\n\nNo se proporcionó código COBOL para documentar.",
         }
-    
+
     try:
         documentation = generate_documentation(cobol_code)
         logger.debug(
@@ -215,23 +239,23 @@ def documenter_node(state: GraphState) -> dict:
 def get_documentation_graph():
     """
     Construye y compila el grafo de LangGraph para documentación.
-    
+
     Este grafo es más simple que el de generación:
     START -> documenter -> END
-    
+
     Returns:
         Grafo compilado listo para ejecutar
     """
     # Crear el grafo de estados
     workflow = StateGraph(GraphState)
-    
+
     # Agregar solo el nodo documenter
     workflow.add_node("documenter", documenter_node)
-    
+
     # Definir aristas: flujo lineal simple
     workflow.add_edge(START, "documenter")
     workflow.add_edge("documenter", END)
-    
+
     # Compilar el grafo
     return workflow.compile()
 
@@ -239,15 +263,15 @@ def get_documentation_graph():
 def run_documentation_process(cobol_code: str) -> GraphState:
     """
     Ejecuta el proceso completo de generación de documentación.
-    
+
     Args:
         cobol_code: Código fuente COBOL a documentar
-    
+
     Returns:
         Estado final con la documentación generada
     """
     graph = get_documentation_graph()
-    
+
     initial_state: GraphState = {
         "request": "Generar documentación técnica",
         "plan": "",
@@ -257,7 +281,7 @@ def run_documentation_process(cobol_code: str) -> GraphState:
         "documentation": "",
         "mode": "documentation",
     }
-    
+
     final_state = graph.invoke(initial_state)
     return final_state
 
