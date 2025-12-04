@@ -4,8 +4,10 @@
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![LangChain](https://img.shields.io/badge/LangChain-Latest-green.svg)](https://langchain.com)
-[![Tests](https://img.shields.io/badge/Tests-51%20Passed-brightgreen.svg)](./tests/)
+[![Gemini](https://img.shields.io/badge/Gemini-3.0%20Pro-orange.svg)](https://deepmind.google/models/gemini/pro/)
+[![Tests](https://img.shields.io/badge/Tests-72%20Passed-brightgreen.svg)](./tests/)
 [![Coverage](https://img.shields.io/badge/Coverage-95%25-brightgreen.svg)](./tests/)
+[![Version](https://img.shields.io/badge/Version-0.3.0-blue.svg)](https://github.com/Srozasc/generador-cobol-ia/releases)
 
 ## 📋 Descripción
 
@@ -15,24 +17,31 @@ El **Generador COBOL IA** es una herramienta avanzada que utiliza inteligencia a
 
 ### 🤖 Agentes de IA Especializados
 - **Agente Planificador**: Convierte lenguaje natural en planes técnicos estructurados
+  - Detecta automáticamente modo de operación (creación/modificación)
+  - Análisis de impacto para modificaciones
 - **Agente Codificador**: Genera código COBOL de alta calidad siguiendo estándares empresariales
+  - Generación de código nuevo desde cero
+  - Modificación inteligente de programas existentes
+- **Agente Documentador**: Genera documentación técnica completa *(Nuevo en v0.2.0)*
 - **Sistema de Autocorrección**: Ciclo automático de validación y corrección de errores
 
-### 🏢 Cabeceras Empresariales Automáticas *(Nuevo)*
+### 🔧 Modo Modificación *(Nuevo en v0.3.0)*
+- **Modificación de programas existentes**: Analiza y modifica código COBOL legacy
+- **Análisis de impacto**: Identifica secciones afectadas por cambios
+- **Preservación de estructura**: Mantiene la arquitectura original del programa
+- **Validación de cambios**: Verifica que las modificaciones sean correctas
+
+### 💾 Guardar Código Generado *(Nuevo en v0.3.0)*
+- **Guardado automático**: Opción para guardar código al finalizar
+- **Extracción de PROGRAM-ID**: Sugiere nombre de archivo basado en el programa
+- **Formato .cbl**: Guarda con extensión estándar COBOL
+- **Encoding UTF-8**: Compatibilidad con editores modernos
+
+### 🏢 Cabeceras Empresariales Automáticas
 - **Generación automática** de cabeceras COBOL estandarizadas
 - **Inferencia inteligente** de sistema y subsistema basada en contexto
 - **Información dinámica**: Fecha, autor, objetivos y mantenimiento
 - **Formato empresarial**: Cumple con estándares corporativos de documentación
-
-### 🔄 Orquestación Inteligente
-- **LangGraph**: Flujo de trabajo basado en grafos para máxima flexibilidad
-- **Validación automática**: Detección y corrección de errores de sintaxis
-- **Retry inteligente**: Hasta 3 intentos de corrección automática
-
-### 🧪 Testing Exhaustivo
-- **TDD**: Desarrollo guiado por pruebas con pytest
-- **Cobertura completa**: 95%+ de cobertura de código
-- **Tests de integración**: Validación end-to-end del flujo completo
 
 ## 🏗️ Arquitectura
 
@@ -84,13 +93,16 @@ copy .env.example .env
 ```bash
 # .env (ejemplo mínimo)
 GOOGLE_API_KEY="tu_api_key_de_google_ai_studio"
-LLM_MODEL="gemini-1.5-flash"   # por defecto en el proyecto
+LLM_MODEL="gemini-3-pro"         # Gemini 3 Pro (recomendado)
+LLM_MAX_OUTPUT_TOKENS=64000      # 64K tokens para archivos grandes
 LLM_TEMPERATURE=0.1
 
 # Opcional
 # OPENAI_API_KEY="sk-..."
 # ANTHROPIC_API_KEY="sk-ant-..."
 ```
+
+**Nota**: Gemini 3 Pro permite generar archivos COBOL completos de más de 1000 líneas gracias a su límite de 64K tokens de salida.
 
 ## 💻 Uso
 
@@ -99,8 +111,36 @@ LLM_TEMPERATURE=0.1
 # Ejecutar el generador
 python run_prototype.py
 
+# Opciones disponibles:
+# 1. Generar nuevo programa COBOL
+# 2. Documentar programa COBOL existente
+# 3. Modificar programa existente (Nuevo en v0.3.0)
+```
+
+### Modo 1: Generar Nuevo Programa
+```bash
 # Ejemplo de solicitud
 > "Crear programa SUPPGPR1 para gestionar información de proveedores"
+
+# Al finalizar, se ofrece guardar el código:
+¿Deseas guardar el código generado? (s/n): s
+Nombre del archivo [SUPPGPR1.cbl]: 
+✅ Código guardado exitosamente en: SUPPGPR1.cbl
+```
+
+### Modo 3: Modificar Programa Existente *(Nuevo)*
+```bash
+# Seleccionar opción 3
+Selecciona una opción (1-3): 3
+
+# Proporcionar ruta del archivo
+Ruta del archivo: ./ejemplo_codigo/SUPPGNF6.txt
+
+# Describir la modificación
+Tu solicitud: "Cambiar el umbral de la tabla de 30000 a 40000 entradas"
+
+# El sistema analiza, modifica y valida el código
+# Al finalizar, ofrece guardar el código modificado
 ```
 
 ### Ejemplo de Salida
@@ -197,10 +237,12 @@ python -m pytest tests/ --cov=. --cov-report=html
 ```
 
 ### Suite de Tests
-- **51 tests** implementados
+- **72 tests** implementados (21 nuevos en v0.3.0)
 - **95%+ cobertura** de código
 - **Tests unitarios** para cada componente
 - **Tests de integración** end-to-end
+- **Tests de modo modificación** (12 tests específicos)
+- **Tests de funcionalidad de guardado** (4 tests)
 - **Tests de cabeceras empresariales** (8 tests específicos)
 - **Stubs de LLM**: `tests/conftest.py` implementa un stub determinista de Gemini
   - Detecta el modo del planificador usando el último mensaje humano
@@ -282,23 +324,38 @@ git push origin feature/nueva-funcionalidad
 
 ## 📈 Roadmap
 
-### Versión 1.1 (Q2 2025)
+### ✅ Versión 0.1.0 (Completada)
+- [x] MVP: Planner + Coder + Validator
+- [x] Graph con LangGraph
+- [x] CLI básico
+- [x] Tests unitarios e integración
+
+### ✅ Versión 0.2.0 (Completada)
+- [x] Agente Documentador
+- [x] Cabeceras empresariales automáticas
+- [x] Inferencia de sistema/subsistema
+
+### ✅ Versión 0.3.0 (Completada - Actual)
+- [x] Modo modificación de programas existentes
+- [x] Guardar código generado en archivos
+- [x] Upgrade a Gemini 3 Pro (64K tokens)
+- [x] Soporte para archivos grandes (>1000 líneas)
+
+### 🔄 Versión 0.4.0 (En Planificación)
 - [ ] Validador real con mainframe (py3270)
+- [ ] Análisis de código existente mejorado
+- [ ] Detección automática de patrones COBOL
+
+### 🔮 Versión 0.5.0 (Futuro)
 - [ ] Interfaz web (FastAPI + React)
-- [ ] Análisis de código existente
-- [ ] Soporte multiidioma en cabeceras
-
-### Versión 1.2 (Q3 2025)
 - [ ] Optimización y refactorización automática
-- [ ] Control de versiones integrado
 - [ ] Dashboard de métricas
-- [ ] Plantillas personalizables
 
-### Versión 2.0 (Q4 2025)
-- [ ] IA avanzada para inferencia de contexto
+### 🎯 Versión 1.0.0 (Producción - Q4 2025)
+- [ ] Validación completa en producción
 - [ ] Integración con herramientas de mainframe
-- [ ] Soporte para estándares internacionales
 - [ ] API REST completa
+- [ ] Soporte para estándares internacionales
 
 ## 🤝 Contribuciones
 
@@ -342,6 +399,7 @@ Este proyecto está bajo la Licencia MIT. Ver [LICENSE](LICENSE) para más detal
 
 **⭐ Si este proyecto te resulta útil, ¡dale una estrella en GitHub!**
 
-**🚀 Versión**: 1.0.0  
-**📅 Última Actualización**: Enero 2025  
-**🔧 Estado**: Producción - MVP Completo
+**🚀 Versión**: 0.3.0 (Prototipo)  
+**📅 Última Actualización**: Diciembre 2024  
+**🔧 Estado**: Desarrollo Activo - Prototipo Funcional  
+**🎯 Próxima Versión**: 0.4.0 (Validador Mainframe)
