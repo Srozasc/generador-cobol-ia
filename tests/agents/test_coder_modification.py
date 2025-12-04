@@ -5,9 +5,12 @@ Verifica que el codificador pueda tomar código COBOL existente y un plan de mod
 y generar código actualizado sin romper la funcionalidad existente.
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from agents.coder import get_coder_chain
+
 
 class TestCoderModificationMode:
     """
@@ -44,38 +47,45 @@ class TestCoderModificationMode:
             "steps": [
                 "Modificar condición IF en PAR-VALIDACION para comparar con 10000",
                 "Agregar lógica para verificar WS-ESTADO-CLIENTE = 'MORA'",
-                "Insertar PERFORM a rutina de log si se cumple condición"
-            ]
+                "Insertar PERFORM a rutina de log si se cumple condición",
+            ],
         }
 
     @patch("agents.coder.ChatGoogleGenerativeAI")
-    def test_coder_accepts_original_code_and_plan(self, mock_llm_class, sample_cobol_code, modification_plan):
+    def test_coder_accepts_original_code_and_plan(
+        self, mock_llm_class, sample_cobol_code, modification_plan
+    ):
         """
         Test que verifica que el coder acepta código original y plan de modificación.
         """
         # Arrange
         from types import SimpleNamespace
-        mock_response = SimpleNamespace(content=sample_cobol_code)  # Por ahora retorna el mismo código
+
+        mock_response = SimpleNamespace(
+            content=sample_cobol_code
+        )  # Por ahora retorna el mismo código
         mock_llm = mock_llm_class.return_value
         mock_llm.invoke.return_value = mock_response
         mock_llm.return_value = mock_response
-        
+
         input_data = {
             "plan": str(modification_plan),
-            "original_code": sample_cobol_code
+            "original_code": sample_cobol_code,
         }
-        
+
         # Act
         chain = get_coder_chain()
         result = chain.invoke(input_data)
-        
+
         # Assert
         assert result is not None
         assert isinstance(result, str)
         assert "IDENTIFICATION DIVISION" in result
 
     @patch("agents.coder.ChatGoogleGenerativeAI")
-    def test_coder_inserts_complex_if_logic(self, mock_llm_class, sample_cobol_code, modification_plan):
+    def test_coder_inserts_complex_if_logic(
+        self, mock_llm_class, sample_cobol_code, modification_plan
+    ):
         """
         Test que verifica que el coder inserta lógica IF compleja sin romper el código.
         """
@@ -97,22 +107,23 @@ class TestCoderModificationMode:
                DISPLAY 'PAGO ALTO CON MORA'
            END-IF.
         """
-        
+
         from types import SimpleNamespace
+
         mock_response = SimpleNamespace(content=expected_modified_code)
         mock_llm = mock_llm_class.return_value
         mock_llm.invoke.return_value = mock_response
         mock_llm.return_value = mock_response
-        
+
         input_data = {
             "plan": str(modification_plan),
-            "original_code": sample_cobol_code
+            "original_code": sample_cobol_code,
         }
-        
+
         # Act
         chain = get_coder_chain()
         result = chain.invoke(input_data)
-        
+
         # Assert
         assert result is not None
         assert "WS-MONTO-PAGO > 10000" in result
@@ -123,7 +134,9 @@ class TestCoderModificationMode:
         assert "PROCEDURE DIVISION" in result
 
     @patch("agents.coder.ChatGoogleGenerativeAI")
-    def test_coder_preserves_existing_code(self, mock_llm_class, sample_cobol_code, modification_plan):
+    def test_coder_preserves_existing_code(
+        self, mock_llm_class, sample_cobol_code, modification_plan
+    ):
         """
         Test que verifica que el coder preserva código no relacionado con el cambio.
         """
@@ -144,22 +157,23 @@ class TestCoderModificationMode:
                DISPLAY 'PAGO ALTO'
            END-IF.
         """
-        
+
         from types import SimpleNamespace
+
         mock_response = SimpleNamespace(content=expected_code)
         mock_llm = mock_llm_class.return_value
         mock_llm.invoke.return_value = mock_response
         mock_llm.return_value = mock_response
-        
+
         input_data = {
             "plan": str(modification_plan),
-            "original_code": sample_cobol_code
+            "original_code": sample_cobol_code,
         }
-        
+
         # Act
         chain = get_coder_chain()
         result = chain.invoke(input_data)
-        
+
         # Assert
         # Verificar que elementos no modificados siguen presentes
         assert "PROGRAM-ID. COBPROG01" in result

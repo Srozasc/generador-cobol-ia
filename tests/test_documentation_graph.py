@@ -333,6 +333,7 @@ class TestDocumentationFlowIntegration:
         assert result["mode"] == "documentation"
         assert "documentation" in result
         assert "E2ETEST" in result["documentation"]
-        assert "SISTEMA DE PRUEBAS" in result["documentation"] or "TEST" in result[
-            "documentation"
-        ]
+        assert (
+            "SISTEMA DE PRUEBAS" in result["documentation"]
+            or "TEST" in result["documentation"]
+        )

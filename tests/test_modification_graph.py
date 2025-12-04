@@ -5,9 +5,12 @@ Verifica que el grafo pueda ejecutar el flujo completo de modificación:
 Planner -> Coder -> Validator (mock) para código COBOL existente.
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from core.graph import GraphState, get_compiled_graph, run_documentation_process
+
 
 class TestModificationGraphIntegration:
     """
@@ -41,9 +44,9 @@ class TestModificationGraphIntegration:
             plan={},
             error_message="",
             mode="modification",
-            original_code="COBOL CODE HERE"
+            original_code="COBOL CODE HERE",
         )
-        
+
         # Assert
         assert state["mode"] == "modification"
         assert "original_code" in state
@@ -59,29 +62,31 @@ class TestModificationGraphIntegration:
         """
         # Arrange
         from types import SimpleNamespace
-        
+
         # Mock Planner
-        mock_plan = SimpleNamespace(content="""
+        mock_plan = SimpleNamespace(
+            content="""
         {
             "plan": "Modificar validación",
             "mode": "modification",
             "analysis": "Cambiar límite",
             "steps": ["Modificar IF"]
         }
-        """)
+        """
+        )
         mock_planner = mock_planner_llm.return_value
         mock_planner.invoke.return_value = mock_plan
         mock_planner.return_value = mock_plan
-        
+
         # Mock Coder
         modified_code = sample_cobol_code.replace("5000", "10000")
         mock_code_response = SimpleNamespace(content=modified_code)
         mock_coder = mock_coder_llm.return_value
         mock_coder.invoke.return_value = mock_code_response
         mock_coder.return_value = mock_code_response
-        
+
         # Validator es un mock, no necesita patch
-        
+
         # Act
         graph = get_compiled_graph()
         initial_state = GraphState(
@@ -89,18 +94,20 @@ class TestModificationGraphIntegration:
             code=sample_cobol_code,  # Código original
             plan={},
             error_message="",
-            mode="modification"
+            mode="modification",
         )
-        
+
         result = graph.invoke(initial_state)
-        
+
         # Assert
         assert result is not None
         assert result["mode"] == "modification"
         assert "10000" in result["code"]  # Verificar que se modificó
         assert "IDENTIFICATION DIVISION" in result["code"]  # Preservó estructura
 
-    def test_modification_mode_preserves_original_code_in_state(self, sample_cobol_code):
+    def test_modification_mode_preserves_original_code_in_state(
+        self, sample_cobol_code
+    ):
         """
         Test que verifica que el código original se preserva en el estado durante el flujo.
         """
@@ -110,9 +117,9 @@ class TestModificationGraphIntegration:
             code=sample_cobol_code,
             plan={},
             error_message="",
-            mode="modification"
+            mode="modification",
         )
-        
+
         # Act & Assert
         # El estado inicial debe tener el código
         assert initial_state["code"] == sample_cobol_code

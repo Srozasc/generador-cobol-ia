@@ -5,9 +5,12 @@ Verifica que el planificador pueda analizar código existente y generar
 un plan de cambios estructurado basado en una solicitud de lenguaje natural.
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from agents.planner import get_planner_chain
+
 
 class TestPlannerModificationMode:
     """
@@ -37,35 +40,36 @@ class TestPlannerModificationMode:
         """
         # Arrange
         request = "Cambiar el límite de pago a 10000"
-        input_data = {
-            "request": request,
-            "original_code": sample_cobol_code
-        }
-        
+        input_data = {"request": request, "original_code": sample_cobol_code}
+
         # Act
         # Nota: Esto fallará hasta que actualicemos get_planner_chain para aceptar original_code
         chain = get_planner_chain()
-        
+
         # Simulamos la invocación para verificar el comportamiento esperado
         # En una prueba real de integración con LLM, esto invocaría al modelo.
         # Aquí queremos verificar que la cadena se construye correctamente para manejar este input.
-        
+
         # Para TDD, primero verificamos que la cadena acepte el input sin error
         # y que el prompt generado incluya el código original.
-        
+
         # Como es difícil inspeccionar la cadena compilada, probaremos la lógica de procesamiento
         # de entrada si es accesible, o haremos un test de integración mockeado.
         pass
 
     @patch("agents.planner.ChatGoogleGenerativeAI")
-    def test_planner_generates_modification_plan(self, mock_llm_class, sample_cobol_code):
+    def test_planner_generates_modification_plan(
+        self, mock_llm_class, sample_cobol_code
+    ):
         """
         Test que verifica que el planner genera un plan de modificación con la estructura correcta.
         Simulamos la respuesta del LLM.
         """
         # Arrange
         from types import SimpleNamespace
-        mock_response = SimpleNamespace(content="""
+
+        mock_response = SimpleNamespace(
+            content="""
         ```json
         {
             "analysis": "Se identificó WS-MONTO-PAGO. El cambio es en PAR-VALIDACION.",
@@ -74,22 +78,20 @@ class TestPlannerModificationMode:
             ]
         }
         ```
-        """)
+        """
+        )
         mock_llm = mock_llm_class.return_value
         # Configurar tanto invoke como __call__ para cubrir ambos casos
         mock_llm.invoke.return_value = mock_response
         mock_llm.return_value = mock_response  # Para __call__
-        
+
         request = "Cambiar el límite de pago a 10000"
-        input_data = {
-            "request": request,
-            "original_code": sample_cobol_code
-        }
-        
+        input_data = {"request": request, "original_code": sample_cobol_code}
+
         # Act
         chain = get_planner_chain()
         result = chain.invoke(input_data)
-        
+
         # Assert
         assert result is not None
         assert "analysis" in result

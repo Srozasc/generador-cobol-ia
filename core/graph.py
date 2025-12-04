@@ -51,12 +51,12 @@ def planner_node(state: GraphState) -> dict:
 
     # Preparar entrada según el modo
     mode = state.get("mode", "generation")
-    
+
     if mode == "modification":
         # Modo modificación: pasar código original
         input_data = {
             "request": state["request"],
-            "original_code": state.get("code", "")  # El código original está en 'code'
+            "original_code": state.get("code", ""),  # El código original está en 'code'
         }
     elif state.get("code") and state.get("error_message"):
         # Modo corrección
@@ -87,20 +87,20 @@ def coder_node(state: GraphState) -> dict:
     """
     logger.info("Ejecutando nodo coder")
     coder_chain = get_coder_chain()
-    
+
     # Preparar entrada según el modo
     mode = state.get("mode", "generation")
-    
+
     if mode == "modification":
         # Modo modificación: pasar plan y código original
         input_data = {
             "plan": state["plan"],
-            "original_code": state.get("code", "")  # El código original está en 'code'
+            "original_code": state.get("code", ""),  # El código original está en 'code'
         }
     else:
         # Modo creación/corrección: solo plan
         input_data = {"plan": state["plan"]}
-    
+
     result = coder_chain.invoke(input_data)
     logger.debug("Código generado (primeras 120 chars): %s", str(result)[:120])
     return {"code": result}

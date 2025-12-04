@@ -7,9 +7,6 @@ que simula la validación de código COBOL sin necesidad de un mainframe real.
 Siguiendo TDD, estos tests se escriben ANTES de implementar el validador.
 """
 
-import pytest
-from unittest.mock import Mock, patch
-
 # Importación del módulo que vamos a testear
 from validators.mock_validator import validate_code
 
@@ -27,20 +24,20 @@ class TestMockValidator:
         valid_cobol = """
         IDENTIFICATION DIVISION.
         PROGRAM-ID. HELLO.
-        
+
         DATA DIVISION.
         WORKING-STORAGE SECTION.
         01 WS-MESSAGE PIC X(20) VALUE 'HELLO WORLD'.
-        
+
         PROCEDURE DIVISION.
         MAIN-PROCESS.
             DISPLAY WS-MESSAGE.
             STOP RUN.
         """
-        
+
         # Act: Validar el código
         result = validate_code(valid_cobol)
-        
+
         # Assert: Debe retornar éxito
         assert result is not None, "Debe retornar un resultado"
         assert isinstance(result, dict), "Debe retornar un diccionario"
@@ -56,21 +53,21 @@ class TestMockValidator:
         invalid_cobol = """
         IDENTIFICATION DIVISION.
         PROGRAM-ID. ERROR-TEST.
-        
+
         DATA DIVISION.
         WORKING-STORAGE SECTION.
         01 WS-INVALID PIC X(20) VALUE 'ERROR'.
-        
+
         PROCEDURE DIVISION.
         MAIN-PROCESS.
             DISPLAY WS-INVALID
             SYNTAX-ERROR-HERE.
             STOP RUN.
         """
-        
+
         # Act: Validar el código con errores
         result = validate_code(invalid_cobol)
-        
+
         # Assert: Debe retornar error
         assert result is not None, "Debe retornar un resultado"
         assert isinstance(result, dict), "Debe retornar un diccionario"
@@ -87,19 +84,21 @@ class TestMockValidator:
         DATA DIVISION.
         WORKING-STORAGE SECTION.
         01 WS-TEST PIC X(10).
-        
+
         PROCEDURE DIVISION.
         MAIN-PROCESS.
             STOP RUN.
         """
-        
+
         # Act: Validar código incompleto
         result = validate_code(incomplete_cobol)
-        
+
         # Assert: Debe detectar la división faltante
         assert result is not None, "Debe retornar un resultado"
         assert result["status"] == "error", "Debe indicar error"
-        assert "IDENTIFICATION DIVISION" in result["message"].upper(), "Debe mencionar la división faltante"
+        assert (
+            "IDENTIFICATION DIVISION" in result["message"].upper()
+        ), "Debe mencionar la división faltante"
 
     def test_handles_empty_code(self):
         """
@@ -107,14 +106,16 @@ class TestMockValidator:
         """
         # Arrange: Código vacío
         empty_code = ""
-        
+
         # Act: Validar código vacío
         result = validate_code(empty_code)
-        
+
         # Assert: Debe manejar código vacío
         assert result is not None, "Debe retornar un resultado"
         assert result["status"] == "error", "Código vacío debe ser error"
-        assert "empty" in result["message"].lower() or "vacío" in result["message"].lower(), "Debe mencionar que está vacío"
+        assert (
+            "empty" in result["message"].lower() or "vacío" in result["message"].lower()
+        ), "Debe mencionar que está vacío"
 
     def test_detects_multiple_errors(self):
         """
@@ -123,20 +124,20 @@ class TestMockValidator:
         # Arrange: Código con múltiples problemas
         multi_error_cobol = """
         PROGRAM-ID. MULTI-ERROR.
-        
+
         WORKING-STORAGE SECTION.
         01 WS-VAR PIC X(10) VALUE 'TEST'.
-        
+
         PROCEDURE DIVISION.
         MAIN-PROCESS.
             DISPLAY WS-VAR
             INVALID-STATEMENT.
             STOP RUN.
         """
-        
+
         # Act: Validar código con múltiples errores
         result = validate_code(multi_error_cobol)
-        
+
         # Assert: Debe detectar errores múltiples
         assert result is not None, "Debe retornar un resultado"
         assert result["status"] == "error", "Debe indicar error"
@@ -150,19 +151,22 @@ class TestMockValidator:
         minimal_cobol = """
         IDENTIFICATION DIVISION.
         PROGRAM-ID. MINIMAL.
-        
+
         PROCEDURE DIVISION.
         MAIN-PROCESS.
             STOP RUN.
         """
-        
+
         # Act: Validar programa mínimo
         result = validate_code(minimal_cobol)
-        
+
         # Assert: Programa mínimo debe ser válido
         assert result is not None, "Debe retornar un resultado"
         assert result["status"] == "success", "Programa mínimo debe ser válido"
-        assert "valid" in result["message"].lower() or "válido" in result["message"].lower(), "Debe indicar validez"
+        assert (
+            "valid" in result["message"].lower()
+            or "válido" in result["message"].lower()
+        ), "Debe indicar validez"
 
 
 class TestMockValidatorEdgeCases:
@@ -175,23 +179,34 @@ class TestMockValidatorEdgeCases:
         Test que verifica el manejo de código muy largo.
         """
         # Arrange: Código COBOL muy largo
-        long_cobol = """
+        long_cobol = (
+            """
         IDENTIFICATION DIVISION.
         PROGRAM-ID. LONG-PROGRAM.
-        
+
         DATA DIVISION.
         WORKING-STORAGE SECTION.
-        """ + "\n".join([f"01 WS-VAR-{i:03d} PIC X(10) VALUE 'TEST{i:03d}'." for i in range(100)]) + """
-        
+        """
+            + "\n".join(
+                [
+                    f"01 WS-VAR-{i:03d} PIC X(10) VALUE 'TEST{i:03d}'."
+                    for i in range(100)
+                ]
+            )
+            + """
+
         PROCEDURE DIVISION.
         MAIN-PROCESS.
-        """ + "\n".join([f"    DISPLAY WS-VAR-{i:03d}." for i in range(100)]) + """
+        """
+            + "\n".join([f"    DISPLAY WS-VAR-{i:03d}." for i in range(100)])
+            + """
             STOP RUN.
         """
-        
+        )
+
         # Act: Validar código largo
         result = validate_code(long_cobol)
-        
+
         # Assert: Debe manejar código largo
         assert result is not None, "Debe retornar un resultado"
         assert isinstance(result, dict), "Debe retornar un diccionario"
@@ -215,10 +230,10 @@ class TestMockValidatorEdgeCases:
             DISPLAY WS-MESSAGE.
             STOP RUN.
         """
-        
+
         # Act: Validar código con caracteres especiales
         result = validate_code(special_chars_cobol)
-        
+
         # Assert: Debe manejar caracteres especiales
         assert result is not None, "Debe retornar un resultado"
         assert isinstance(result, dict), "Debe retornar un diccionario"
@@ -238,13 +253,13 @@ class TestMockValidatorInterface:
         # Act: Importar y verificar la función
         # from validators.mock_validator import validate_code
         # import inspect
-        
+
         # Assert: Verificar signatura
         # sig = inspect.signature(validate_code)
         # assert len(sig.parameters) == 1, "Debe tener exactamente un parámetro"
         # param_name = list(sig.parameters.keys())[0]
         # assert param_name == "code", "El parámetro debe llamarse 'code'"
-        
+
         # Por ahora, placeholder hasta implementar
         assert True  # Placeholder hasta implementar la función
 
@@ -253,22 +268,24 @@ class TestMockValidatorInterface:
         Test que verifica la consistencia del tipo de retorno.
         """
         # Arrange: Diferentes tipos de código
-        test_codes = [
-            "IDENTIFICATION DIVISION.\nPROGRAM-ID. TEST.\nPROCEDURE DIVISION.\nSTOP RUN.",
-            "",
-            "INVALID CODE",
-            "IDENTIFICATION DIVISION.\nPROGRAM-ID. VALID.\nDATA DIVISION.\nPROCEDURE DIVISION.\nSTOP RUN."
-        ]
-        
+        # Nota: Se elimina la variable no utilizada para evitar F841.
+
         # Act & Assert: Verificar consistencia de retorno
         # from validators.mock_validator import validate_code
         # for code in test_codes:
         #     result = validate_code(code)
-        #     assert isinstance(result, dict), f"Debe retornar dict para código: {code[:20]}..."
+        #     assert isinstance(
+        #         result, dict
+        #     ), f"Debe retornar dict para código: {code[:20]}..."
         #     assert "status" in result, "Debe tener campo 'status'"
         #     assert "message" in result, "Debe tener campo 'message'"
-        #     assert result["status"] in ["success", "error"], "Status debe ser 'success' o 'error'"
-        #     assert isinstance(result["message"], str), "Message debe ser string"
-        
+        #     assert result["status"] in [
+        #         "success",
+        #         "error",
+        #     ], "Status debe ser 'success' o 'error'"
+        #     assert isinstance(
+        #         result["message"], str
+        #     ), "Message debe ser string"
+
         # Por ahora, placeholder hasta implementar
         assert True  # Placeholder hasta implementar la función

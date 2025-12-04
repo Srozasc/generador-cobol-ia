@@ -81,7 +81,7 @@ def get_coder_chain():
             return {
                 "plan": plan_text,
                 "original_code": original_code,
-                "mode": "modification"
+                "mode": "modification",
             }
         else:
             # Modo Creación: Lógica original
@@ -130,7 +130,7 @@ PLAN TÉCNICO ORIGINAL:
                 "system_desc": system_desc,
                 "subsystem": subsystem,
                 "objectives": objectives,
-                "mode": "creation"
+                "mode": "creation",
             }
 
     # Prompt especializado para generación de código COBOL IBM z/OS/390 con Datacom
@@ -584,17 +584,17 @@ Genera ÚNICAMENTE el código COBOL completo modificado.""",
     def select_prompt_and_invoke(enriched_data: Dict[str, Any]):
         """Selecciona el prompt template apropiado según el modo e invoca el LLM."""
         mode = enriched_data.get("mode", "creation")
-        
+
         if mode == "modification":
             # Modo modificación: usar prompt de mantenimiento
             messages = modification_prompt_template.invoke(enriched_data)
         else:
             # Modo creación: usar prompt original
             messages = prompt_template.invoke(enriched_data)
-        
+
         # Invocar el LLM con los mensajes generados
         response = llm.invoke(messages)
-        
+
         # Extraer el contenido del mensaje de respuesta
         if hasattr(response, "content"):
             return response.content

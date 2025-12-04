@@ -10,7 +10,7 @@ Siguiendo TDD, estos tests se escriben ANTES de implementar el agente.
 import pytest
 
 # Importación del módulo a implementar
-from agents.documenter import get_documenter_chain, generate_documentation
+from agents.documenter import generate_documentation, get_documenter_chain
 
 
 class TestDocumenterAgent:

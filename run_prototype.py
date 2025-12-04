@@ -169,21 +169,22 @@ def display_results(result: dict):
     # Mostrar el código generado
     if result.get("code"):
         print_code_block("CÓDIGO COBOL GENERADO", result["code"])
-        
+
         # Opción de guardar
         save = input("¿Deseas guardar el código generado? (s/n): ").strip().lower()
         if save == "s":
             # Intentar extraer nombre del programa
             default_name = "PROGRAMA.cbl"
             import re
+
             match = re.search(r"PROGRAM-ID[.\s]+([A-Z0-9]+)", result["code"])
             if match:
                 default_name = f"{match.group(1)}.cbl"
-                
+
             filename = input(f"Nombre del archivo [{default_name}]: ").strip()
             if not filename:
                 filename = default_name
-                
+
             try:
                 with open(filename, "w", encoding="utf-8") as f:
                     f.write(result["code"])
@@ -383,7 +384,7 @@ def run_modification_process(original_code: str, request: str) -> Optional[dict]
             "error_message": None,
             "retry_count": 0,
             "mode": "modification",
-            "original_code": original_code # También en original_code por claridad
+            "original_code": original_code,  # También en original_code por claridad
         }
 
         print_status("Analizando impacto y generando plan...", "processing")
@@ -455,17 +456,17 @@ def main():
             # Flujo de modificación (nuevo)
             file_path = get_file_path()
             print()
-            
+
             print_status("Cargando archivo original...", "processing")
             original_code = load_cobol_file(file_path)
             print_status(f"Archivo cargado: {len(original_code)} caracteres", "success")
             print()
-            
+
             user_request = get_user_request()
             print()
-            
+
             result = run_modification_process(original_code, user_request)
-            
+
             if result:
                 display_results(result)
                 print_step(5, "PROCESO COMPLETADO")

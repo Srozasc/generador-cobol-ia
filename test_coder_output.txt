@@ -1,0 +1,72 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.2, pytest-9.0.1, pluggy-1.6.0 -- D:\desarrollo\workspace\generador_cobol_ia\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\desarrollo\workspace\generador_cobol_ia
+configfile: pyproject.toml
+plugins: anyio-4.11.0, langsmith-0.4.33, cov-7.0.0, mock-3.15.1
+collecting ... collected 1 item
+
+tests/agents/test_coder_modification.py::TestCoderModificationMode::test_coder_accepts_original_code_and_plan FAILED
+
+================================== FAILURES ===================================
+_____ TestCoderModificationMode.test_coder_accepts_original_code_and_plan _____
+
+self = <tests.agents.test_coder_modification.TestCoderModificationMode object at 0x000001BDA9CBFC50>
+mock_llm_class = <MagicMock name='ChatGoogleGenerativeAI' id='1914109636496'>
+sample_cobol_code = "       IDENTIFICATION DIVISION.\n       PROGRAM-ID. COBPROG01.\n       AUTHOR. SISTEMA BANCARIO.\n       DATA DIVISIO... PAR-VALIDACION.\n           IF WS-MONTO-PAGO > 5000\n               DISPLAY 'PAGO ALTO'\n           END-IF.\n        "
+modification_plan = {'analysis': 'Se identific¾ WS-MONTO-PAGO. Cambio en PAR-VALIDACION.', 'mode': 'modification', 'plan': 'Modificar l¾gi..."Agregar l¾gica para verificar WS-ESTADO-CLIENTE = 'MORA'", 'Insertar PERFORM a rutina de log si se cumple condici¾n']}
+
+    @patch("agents.coder.ChatGoogleGenerativeAI")
+    def test_coder_accepts_original_code_and_plan(self, mock_llm_class, sample_cobol_code, modification_plan):
+        """
+        Test que verifica que el coder acepta c¾digo original y plan de modificaci¾n.
+        """
+        # Arrange
+        from types import SimpleNamespace
+        mock_response = SimpleNamespace(content=sample_cobol_code)  # Por ahora retorna el mismo c¾digo
+        mock_llm = mock_llm_class.return_value
+        mock_llm.invoke.return_value = mock_response
+        mock_llm.return_value = mock_response
+    
+        input_data = {
+            "plan": str(modification_plan),
+            "original_code": sample_cobol_code
+        }
+    
+        # Act
+        chain = get_coder_chain()
+>       result = chain.invoke(input_data)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\agents\test_coder_modification.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\langchain_core\runnables\base.py:3246: in invoke
+    input_ = context.run(step.invoke, input_, config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\langchain_core\output_parsers\base.py:208: in invoke
+    return self._call_with_config(
+.venv\Lib\site-packages\langchain_core\runnables\base.py:2092: in _call_with_config
+    context.run(
+.venv\Lib\site-packages\langchain_core\runnables\config.py:430: in call_func_with_variable_args
+    return func(input, **kwargs)  # type: ignore[call-arg]
+           ^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\langchain_core\output_parsers\base.py:209: in <lambda>
+    lambda inner_input: self.parse_result([Generation(text=inner_input)]),
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = Generation(), args = ()
+kwargs = {'text': namespace(content="       IDENTIFICATION DIVISION.\n       PROGRAM-ID. COBPROG01.\n       AUTHOR. SISTEMA BAN...AR-VALIDACION.\n           IF WS-MONTO-PAGO > 5000\n               DISPLAY 'PAGO ALTO'\n           END-IF.\n        ")}
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """"""  # noqa: D419  # Intentional blank docstring
+>       super().__init__(*args, **kwargs)
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for Generation
+E       text
+E         Input should be a valid string [type=string_type, input_value=namespace(content="      ...     END-IF.\n        "), input_type=SimpleNamespace]
+E           For further information visit https://errors.pydantic.dev/2.12/v/string_type
+
+.venv\Lib\site-packages\langchain_core\load\serializable.py:115: ValidationError
+=========================== short test summary info ===========================
+FAILED tests/agents/test_coder_modification.py::TestCoderModificationMode::test_coder_accepts_original_code_and_plan
+============================== 1 failed in 1.33s ==============================

@@ -1,0 +1,60 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.2, pytest-9.0.1, pluggy-1.6.0 -- D:\desarrollo\workspace\generador_cobol_ia\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\desarrollo\workspace\generador_cobol_ia
+configfile: pyproject.toml
+plugins: anyio-4.11.0, langsmith-0.4.33, cov-7.0.0, mock-3.15.1
+collecting ... collected 1 item
+
+tests/agents/test_planner_modification.py::TestPlannerModificationMode::test_planner_generates_modification_plan DEBUG: Text to parse: <MagicMock name='ChatGoogleGenerativeAI()().content' id='2625231045696'>
+DEBUG: Direct parsing failed: 1 validation error for Generation
+text
+  Input should be a valid string [type=string_type, input_value=<MagicMock name='ChatGoog...ent' id='2625231045696'>, input_type=MagicMock]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+FAILED
+
+================================== FAILURES ===================================
+____ TestPlannerModificationMode.test_planner_generates_modification_plan _____
+
+self = <tests.agents.test_planner_modification.TestPlannerModificationMode object at 0x000002633BF0C690>
+mock_llm_class = <MagicMock name='ChatGoogleGenerativeAI' id='2625229876128'>
+sample_cobol_code = "\n       IDENTIFICATION DIVISION.\n       PROGRAM-ID. COBPROG01.\n       DATA DIVISION.\n       WORKING-STORAGE SECTI... PAR-VALIDACION.\n           IF WS-MONTO-PAGO > 5000\n               DISPLAY 'PAGO ALTO'\n           END-IF.\n        "
+
+    @patch("agents.planner.ChatGoogleGenerativeAI")
+    def test_planner_generates_modification_plan(self, mock_llm_class, sample_cobol_code):
+        """
+        Test que verifica que el planner genera un plan de modificaci¾n con la estructura correcta.
+        Simulamos la respuesta del LLM.
+        """
+        # Arrange
+        mock_llm = mock_llm_class.return_value
+        mock_llm.invoke.return_value.content = """
+        ```json
+        {
+            "analysis": "Se identific¾ WS-MONTO-PAGO. El cambio es en PAR-VALIDACION.",
+            "steps": [
+                "Modificar condici¾n IF en PAR-VALIDACION para comparar con 10000"
+            ]
+        }
+        ```
+        """
+    
+        request = "Cambiar el lÝmite de pago a 10000"
+        input_data = {
+            "request": request,
+            "original_code": sample_cobol_code
+        }
+    
+        # Act
+        chain = get_planner_chain()
+        result = chain.invoke(input_data)
+    
+        # Assert
+        assert result is not None
+>       assert "analysis" in result
+E       AssertionError: assert 'analysis' in {'mode': 'creation', 'plan': 'Plan de emergencia - error en parsing JSON', 'steps': ['Revisar solicitud', 'Generar plan manualmente']}
+
+tests\agents\test_planner_modification.py:91: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/agents/test_planner_modification.py::TestPlannerModificationMode::test_planner_generates_modification_plan
+============================== 1 failed in 1.64s ==============================

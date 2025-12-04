@@ -18,8 +18,8 @@ import os
 from typing import Any, Dict
 
 from dotenv import load_dotenv
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 # Cargar variables de entorno
@@ -238,10 +238,10 @@ Genera un plan de desarrollo en formato JSON para esta nueva funcionalidad.
 
 
 def generate_plan(
-    request: str, 
-    code: str | None = None, 
+    request: str,
+    code: str | None = None,
     error_message: str | None = None,
-    original_code: str | None = None  # Alias para code en modo modificación
+    original_code: str | None = None,  # Alias para code en modo modificación
 ) -> Dict[str, Any]:
     """
     Función de conveniencia para generar planes técnicos.
@@ -269,10 +269,10 @@ def generate_plan(
 
     # Preparar datos de entrada
     input_data = {"request": request}
-    
+
     # Manejar alias original_code
     effective_code = code if code else original_code
-    
+
     if effective_code:
         input_data["code"] = effective_code
     if error_message:

@@ -12,7 +12,6 @@ import json
 from typing import Any, List
 
 import pytest
-
 from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableLambda
 
@@ -42,9 +41,14 @@ def _collect_text(input_obj: Any) -> str:
 def _stub_planner_output(prompt_text: str) -> AIMessage:
     upper = prompt_text.upper()
     import re
+
     # Detectar modo solo por etiquetas explícitas en el mensaje humano
     has_creation = bool(re.search(r"MODO:\s*CREACI[ÓO]N", upper))
-    has_correction = bool(re.search(r"MODO:\s*CORRECCI[ÓO]N", upper)) or bool(re.search(r"C[ÓO]DIGO ACTUAL:\s*", upper)) or bool(re.search(r"ERROR REPORTADO:\s*", upper))
+    has_correction = (
+        bool(re.search(r"MODO:\s*CORRECCI[ÓO]N", upper))
+        or bool(re.search(r"C[ÓO]DIGO ACTUAL:\s*", upper))
+        or bool(re.search(r"ERROR REPORTADO:\s*", upper))
+    )
 
     if has_creation and not has_correction:
         payload = {
@@ -55,8 +59,8 @@ def _stub_planner_output(prompt_text: str) -> AIMessage:
                 "Definir FILE-CONTROL y FILE SECTION",
                 "Crear WORKING-STORAGE con niveles jerárquicos",
                 "Implementar PROCEDURE DIVISION modular",
-                "Validar estructura"
-            ]
+                "Validar estructura",
+            ],
         }
     elif has_correction:
         payload = {
@@ -66,16 +70,16 @@ def _stub_planner_output(prompt_text: str) -> AIMessage:
                 "Analizar error de entrada",
                 "Corregir sintaxis en PROCEDURE DIVISION",
                 "Agregar secciones faltantes",
-                "Validar estructura final"
+                "Validar estructura final",
             ],
             "correction_type": "syntactic",
-            "original_error": "Error de sintaxis reportado"
+            "original_error": "Error de sintaxis reportado",
         }
     else:
         payload = {
             "mode": "creation",
             "plan": "Generar programa COBOL estándar",
-            "steps": ["Diseño", "Implementación", "Validación"]
+            "steps": ["Diseño", "Implementación", "Validación"],
         }
     return AIMessage(content=json.dumps(payload, ensure_ascii=False))
 
@@ -83,18 +87,29 @@ def _stub_planner_output(prompt_text: str) -> AIMessage:
 def _stub_coder_output(prompt_text: str) -> AIMessage:
     # Extraer información dinámica si está disponible
     import re
+
     upper_text = prompt_text.upper()
     prog_match = re.search(r"PROGRAM-ID:\s*([A-Z0-9]{4,8})", upper_text, re.IGNORECASE)
     # Intentar detectar nombres tipo SUPPGPR1, CLNTPGR1, FINPGR02, NOMPGR01, TESTPGR1 desde el texto
     pgr_match = re.search(r"\b[A-Z]{3,5}PGR[0-9]{1,2}\b", upper_text)
-    date_match = re.search(r"DATE-WRITTEN:\s*([0-9]{2}\/[0-9]{2}\/[0-9]{4})", upper_text)
+    date_match = re.search(
+        r"DATE-WRITTEN:\s*([0-9]{2}\/[0-9]{2}\/[0-9]{4})", upper_text
+    )
     system_match = re.search(r"SISTEMA:\s*([A-ZÁÉÍÓÚ\- ]+)", upper_text, re.IGNORECASE)
-    subsystem_match = re.search(r"SUBSISTEMA:\s*([A-Z0-9\- ]+)", upper_text, re.IGNORECASE)
-    objectives_match = re.search(r"OBJETIVOS:\s*([A-Z0-9\- ]+)", upper_text, re.IGNORECASE)
+    subsystem_match = re.search(
+        r"SUBSISTEMA:\s*([A-Z0-9\- ]+)", upper_text, re.IGNORECASE
+    )
+    objectives_match = re.search(
+        r"OBJETIVOS:\s*([A-Z0-9\- ]+)", upper_text, re.IGNORECASE
+    )
 
-    program_id = (prog_match.group(1) if prog_match else (pgr_match.group(0) if pgr_match else "PROG001"))
-    date_written = (date_match.group(1) if date_match else "01/01/2025")
-    system_desc = (system_match.group(1) if system_match else "BANCARIO")
+    program_id = (
+        prog_match.group(1)
+        if prog_match
+        else (pgr_match.group(0) if pgr_match else "PROG001")
+    )
+    date_written = date_match.group(1) if date_match else "01/01/2025"
+    system_desc = system_match.group(1) if system_match else "BANCARIO"
     # Derivar SUBSISTEMA desde el nombre del programa si no viene explícito
     if subsystem_match:
         subsystem = subsystem_match.group(1)
@@ -112,7 +127,9 @@ def _stub_coder_output(prompt_text: str) -> AIMessage:
             subsystem = "NOM"
         else:
             subsystem = pu[:4]
-    objectives = (objectives_match.group(1) if objectives_match else "PROCESAR TRANSACCIONES")
+    objectives = (
+        objectives_match.group(1) if objectives_match else "PROCESAR TRANSACCIONES"
+    )
 
     code = (
         "       IDENTIFICATION DIVISION.\n"
@@ -199,6 +216,7 @@ def stub_gemini_llm(mocker):
             ):
                 return _stub_coder_output(text)
             return _stub_planner_output(text)
+
         return RunnableLambda(_stub_func)
 
     mocker.patch("agents.planner.ChatGoogleGenerativeAI", _factory)
