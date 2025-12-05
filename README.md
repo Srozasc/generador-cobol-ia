@@ -49,7 +49,8 @@ El **Generador COBOL IA** es una herramienta avanzada que utiliza inteligencia a
 generador_cobol_ia/
 ├── agents/                 # Agentes de IA especializados
 │   ├── planner.py         # Agente Planificador
-│   └── coder.py           # Agente Codificador + Cabeceras
+│   ├── coder.py           # Agente Codificador + Cabeceras
+│   └── documenter.py      # Agente Documentador
 ├── validators/            # Sistema de validación
 │   ├── mock_validator.py  # Validador simulado (MVP)
 │   └── mainframe_validator.py # Validador real (futuro)
