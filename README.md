@@ -128,6 +128,52 @@ Nombre del archivo [SUPPGPR1.cbl]:
 ✅ Código guardado exitosamente en: SUPPGPR1.cbl
 ```
 
+### Modo 2: Documentar Programa Existente
+```bash
+# Seleccionar opción 2
+Selecciona una opción (1-3): 2
+
+# Proporcionar ruta del archivo COBOL
+Ruta del archivo: ./ejemplo_codigo/SUPPGPR1.cbl
+
+# El sistema analiza el código y genera documentación completa:
+# - Descripción general del programa
+# - Propósito y funcionalidad
+# - Estructura de datos (FILE SECTION, WORKING-STORAGE)
+# - Flujo de procedimientos
+# - Secciones y párrafos principales
+# - Análisis de complejidad
+
+# Al finalizar, ofrece guardar la documentación:
+¿Deseas guardar la documentación? (s/n): s
+Nombre del archivo [SUPPGPR1_DOC.md]: 
+✅ Documentación guardada exitosamente en: SUPPGPR1_DOC.md
+```
+
+**Ejemplo de Documentación Generada:**
+```markdown
+# Documentación Técnica: SUPPGPR1
+
+## Descripción General
+Programa para gestión de información de proveedores...
+
+## Estructura de Datos
+### FILE SECTION
+- PROVEEDOR-FILE: Archivo maestro de proveedores
+
+### WORKING-STORAGE SECTION
+- WS-PROVEEDOR-RECORD: Registro de trabajo
+  - WS-CODIGO-PROVEEDOR (X(10))
+  - WS-NOMBRE-PROVEEDOR (X(50))
+  ...
+
+## Flujo de Procedimientos
+1. MAIN-PROCESS: Proceso principal
+2. LEER-PROVEEDOR: Lectura de registros
+3. VALIDAR-DATOS: Validación de información
+...
+```
+
 ### Modo 3: Modificar Programa Existente *(Nuevo)*
 ```bash
 # Seleccionar opción 3
